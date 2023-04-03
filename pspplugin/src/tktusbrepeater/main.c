@@ -1,4 +1,5 @@
 #include "tktusbrepeater/config.h"
+#include "tktusbrepeater/parson.h"
 #include <pspkernel.h>
 #include <pspusb.h>
 
@@ -25,6 +26,8 @@ int module_start(
     , void *    _argp
 )
 {
+    initializeParson();
+
     if( loadConfigFile(
         &configId
         , &config
