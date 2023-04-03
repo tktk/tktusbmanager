@@ -3,6 +3,7 @@ TARGET = tktusbrepeater
 OBJS += \
     src/tktusbrepeater/main.o \
     src/tktusbrepeater/config.o \
+    src/tktusbrepeater/parson.o \
     parson/parson.o \
 
 USE_KERNEL_LIBC = 1
