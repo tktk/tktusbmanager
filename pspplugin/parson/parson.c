@@ -120,7 +120,10 @@ typedef struct json_string {
 typedef union json_value_value {
     JSON_String  string;
     double       number;
-    JSON_Object *object;
+    struct {
+        SceUID          objectId;
+        JSON_Object *   object;
+    };
     JSON_Array  *array;
     int          boolean;
     int          null;
@@ -170,15 +173,24 @@ static unsigned long hash_string(const char *string, size_t n);
 /*
 static JSON_Object * json_object_make(JSON_Value *wrapping_value);
 static JSON_Status   json_object_init(JSON_Object *object, size_t capacity);
-static void          json_object_deinit(JSON_Object *object, parson_bool_t free_keys, parson_bool_t free_values);
+*/
+static void          json_object_deinit(
+    JSON_Object *   object
+    , parson_bool_t free_keys
+    , parson_bool_t free_values
+);
+/*
 static JSON_Status   json_object_grow_and_rehash(JSON_Object *object);
 static size_t        json_object_get_cell_ix(const JSON_Object *object, const char *key, size_t key_len, unsigned long hash, parson_bool_t *out_found);
 static JSON_Status   json_object_add(JSON_Object *object, char *name, JSON_Value *value);
 static JSON_Value  * json_object_getn_value(const JSON_Object *object, const char *name, size_t name_len);
 static JSON_Status   json_object_remove_internal(JSON_Object *object, const char *name, parson_bool_t free_value);
 static JSON_Status   json_object_dotremove_internal(JSON_Object *object, const char *name, parson_bool_t free_value);
-static void          json_object_free(JSON_Object *object);
 */
+static void          json_object_free(
+    SceUID          objectId
+    , JSON_Object * object
+);
 
 // JSON Array
 /*
@@ -490,8 +502,15 @@ error:
     parson_free(object->hashes);
     return JSONFailure;
 }
+*/
 
-static void json_object_deinit(JSON_Object *object, parson_bool_t free_keys, parson_bool_t free_values) {
+static void json_object_deinit(
+    JSON_Object *   object
+    , parson_bool_t free_keys
+    , parson_bool_t free_values
+)
+{
+/*
     unsigned int i = 0;
     for (i = 0; i < object->count; i++) {
         if (free_keys) {
@@ -517,8 +536,10 @@ static void json_object_deinit(JSON_Object *object, parson_bool_t free_keys, par
     object->values = NULL;
     object->cell_ixs = NULL;
     object->hashes = NULL;
+*/
 }
 
+/*
 static JSON_Status json_object_grow_and_rehash(JSON_Object *object) {
     JSON_Value *wrapping_value = NULL;
     JSON_Object new_object;
@@ -708,12 +729,20 @@ static JSON_Status json_object_dotremove_internal(JSON_Object *object, const cha
     temp_object = json_value_get_object(temp_value);
     return json_object_dotremove_internal(temp_object, dot_pos + 1, free_value);
 }
-
-static void json_object_free(JSON_Object *object) {
-    json_object_deinit(object, PARSON_TRUE, PARSON_TRUE);
-    parson_free(object);
-}
 */
+
+static void json_object_free(
+    SceUID          objectId
+    , JSON_Object * object
+)
+{
+    json_object_deinit(
+        object
+        , PARSON_TRUE
+        , PARSON_TRUE
+    );
+    parson_free( objectId );
+}
 
 // JSON Array
 /*
@@ -1620,14 +1649,17 @@ void json_value_free(
     , JSON_Value *  value
 )
 {
+    JSON_Value_Value *  valueValue = &( value->value );
+
     switch( json_value_get_type( value ) ) {
-/*
         case JSONObject:
-            json_object_free( value->value.object );
+            json_object_free(
+                valueValue->objectId
+                , valueValue->object
+            );
             break;
-*/
         case JSONString:
-            parson_free( value->value.string.charsId );
+            parson_free( valueValue->string.charsId );
             break;
 /*
         case JSONArray:
