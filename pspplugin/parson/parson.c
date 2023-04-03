@@ -1500,8 +1500,16 @@ JSON_Value * json_parse_string(const char *string) {
     }
     return parse_value((const char**)&string, 0);
 }
+*/
 
-JSON_Value * json_parse_string_with_comments(const char *string) {
+JSON_Value * json_parse_string_with_comments(
+    SceUID *        valueIdPtr
+    , const char *  string
+)
+{
+    //TODO
+    return NULL;
+/*
     JSON_Value *result = NULL;
     char *string_mutable_copy = NULL, *string_mutable_copy_ptr = NULL;
     string_mutable_copy = parson_strdup(string);
@@ -1514,8 +1522,8 @@ JSON_Value * json_parse_string_with_comments(const char *string) {
     result = parse_value((const char**)&string_mutable_copy_ptr, 0);
     parson_free(string_mutable_copy);
     return result;
-}
 */
+}
 
 // JSON Object API
 

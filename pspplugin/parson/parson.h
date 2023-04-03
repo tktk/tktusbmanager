@@ -108,7 +108,10 @@ JSON_Value * json_parse_string(const char *string);
 
 /*  Parses first JSON value in a string and ignores comments (/ * * / and //),
     returns NULL in case of error */
-JSON_Value * json_parse_string_with_comments(const char *string);
+JSON_Value * json_parse_string_with_comments(
+    SceUID *        valueIdPtr
+    , const char *  string
+);
 
 /* Serialization */
 size_t      json_serialization_size(const JSON_Value *value); /* returns 0 on fail */
