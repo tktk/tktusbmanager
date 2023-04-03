@@ -173,7 +173,13 @@ struct json_array_t {
 /*
 static char * read_file(const char *filename);
 static void   remove_comments(char *string, const char *start_token, const char *end_token);
-static char * parson_strndup(const char *string, size_t n);
+*/
+static char * parson_strndup(
+    SceUID *        stringIdPtr
+    , const char *  string
+    , size_t        n
+);
+/*
 static char * parson_strdup(const char *string);
 static int    hex_char_to_int(char c);
 static JSON_Status parse_utf16_hex(const char *string, unsigned int *result);
@@ -314,18 +320,33 @@ static void remove_comments(char *string, const char *start_token, const char *e
         string++;
     }
 }
+*/
 
-static char * parson_strndup(const char *string, size_t n) {
+static char * parson_strndup(
+    SceUID *        stringIdPtr
+    , const char *  string
+    , size_t        n
+)
+{
     // We expect the caller has validated that 'n' fits within the input buffer.
-    char *output_string = (char*)parson_malloc(n + 1);
-    if (!output_string) {
+    SceUID  output_stringId = parson_malloc( n + 1 );
+    char *  output_string = ( char * )parson_get_addr( output_stringId );
+    if( !output_string ) {
         return NULL;
     }
-    output_string[n] = '\0';
-    memcpy(output_string, string, n);
+    *stringIdPtr = output_stringId;
+
+    output_string[ n ] = '\0';
+    memcpy(
+        output_string
+        , string
+        , n
+    );
+
     return output_string;
 }
 
+/*
 static char * parson_strdup(const char *string) {
     return parson_strndup(string, strlen(string));
 }
