@@ -93,6 +93,7 @@
 
 static JSON_Malloc_Function parson_malloc = NULL;
 static JSON_Free_Function parson_free = NULL;
+static JSON_GetAddr_Function parson_get_addr = NULL;
 
 /*
 static int parson_escape_slashes = 1;

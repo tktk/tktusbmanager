@@ -67,6 +67,7 @@ typedef int JSON_Status;
 
 typedef SceUID ( *JSON_Malloc_Function )( SceSize );
 typedef void   ( *JSON_Free_Function )( SceUID );
+typedef void * ( *JSON_GetAddr_Function )( SceUID );
 
 /* A function used for serializing numbers (see json_set_number_serialization_function).
    If 'buf' is null then it should return number of bytes that would've been written 
