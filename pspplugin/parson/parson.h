@@ -253,7 +253,10 @@ JSON_Value * json_value_init_number (double number);
 JSON_Value * json_value_init_boolean(int boolean);
 JSON_Value * json_value_init_null   (void);
 JSON_Value * json_value_deep_copy   (const JSON_Value *value);
-void         json_value_free        (JSON_Value *value);
+void         json_value_free        (
+    SceUID          valueId
+    , JSON_Value *  value
+);
 
 JSON_Value_Type json_value_get_type   (const JSON_Value *value);
 JSON_Object *   json_value_get_object (const JSON_Value *value);

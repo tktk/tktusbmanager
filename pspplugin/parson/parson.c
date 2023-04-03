@@ -111,8 +111,9 @@ typedef int parson_bool_t;
 #define PARSON_FALSE 0
 
 typedef struct json_string {
-    char *chars;
-    size_t length;
+    SceUID  charsId;
+    char *  chars;
+    size_t  length;
 } JSON_String;
 
 // Type definitions
@@ -1574,11 +1575,11 @@ JSON_Value * json_array_get_wrapping_value(const JSON_Array *array) {
 */
 
 // JSON Value API
-/*
 JSON_Value_Type json_value_get_type(const JSON_Value *value) {
     return value ? value->type : JSONError;
 }
 
+/*
 JSON_Object * json_value_get_object(const JSON_Value *value) {
     return json_value_get_type(value) == JSONObject ? value->value.object : NULL;
 }
@@ -1612,24 +1613,35 @@ int json_value_get_boolean(const JSON_Value *value) {
 JSON_Value * json_value_get_parent (const JSON_Value *value) {
     return value ? value->parent : NULL;
 }
+*/
 
-void json_value_free(JSON_Value *value) {
-    switch (json_value_get_type(value)) {
+void json_value_free(
+    SceUID          valueId
+    , JSON_Value *  value
+)
+{
+    switch( json_value_get_type( value ) ) {
+/*
         case JSONObject:
-            json_object_free(value->value.object);
+            json_object_free( value->value.object );
             break;
+*/
         case JSONString:
-            parson_free(value->value.string.chars);
+            parson_free( value->value.string.charsId );
             break;
+/*
         case JSONArray:
-            json_array_free(value->value.array);
+            json_array_free( value->value.array );
             break;
+*/
         default:
             break;
     }
-    parson_free(value);
+
+    parson_free( valueId );
 }
 
+/*
 JSON_Value * json_value_init_object(void) {
     JSON_Value *new_value = (JSON_Value*)parson_malloc(sizeof(JSON_Value));
     if (!new_value) {

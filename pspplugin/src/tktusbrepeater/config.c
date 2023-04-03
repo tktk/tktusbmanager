@@ -1,5 +1,5 @@
 #include "tktusbrepeater/config.h"
-//#include "parson/parson.h"
+#include "parson/parson.h"
 #include <pspiofilemgr.h>
 #include <pspsysmem.h>
 #include <string.h>
@@ -162,11 +162,10 @@ static int parseConfigFile(
     , const char *          _CONTENTS
 )
 {
-    //TODO
-    return 0;
-/*
     SceUID  rootJsonId = 0;
 
+    JSON_Value *    rootJson = NULL;
+/*
     JSON_Value *    rootJson = json_parse_file_with_comments(
         &rootJsonId
         , _FILE_PATH
@@ -176,11 +175,14 @@ static int parseConfigFile(
     }
 
     TktUsbRepeaterConfig *  config = parseConfigJson( rootJson );
+*/
 
-    json_value_free( rootJsonId );
+    json_value_free(
+        rootJsonId
+        , rootJson
+    );
 
     return 0;
-*/
 }
 
 int loadConfigFile(
