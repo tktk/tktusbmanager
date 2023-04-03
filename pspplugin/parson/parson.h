@@ -40,6 +40,7 @@ extern "C"
 
 #define PARSON_VERSION_STRING "1.5.1"
 
+#include <pspkerneltypes.h>
 #include <stddef.h>   /* size_t */
 
 /* Types and enums */
@@ -64,8 +65,8 @@ enum json_result_t {
 };
 typedef int JSON_Status;
 
-typedef void * (*JSON_Malloc_Function)(size_t);
-typedef void   (*JSON_Free_Function)(void *);
+typedef SceUID ( *JSON_Malloc_Function )( SceSize );
+typedef void   ( *JSON_Free_Function )( SceUID );
 
 /* A function used for serializing numbers (see json_set_number_serialization_function).
    If 'buf' is null then it should return number of bytes that would've been written 
