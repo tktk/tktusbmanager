@@ -179,8 +179,11 @@ static char * parson_strndup(
     , const char *  string
     , size_t        n
 );
+static char * parson_strdup(
+    SceUID *        stringIdPtr
+    , const char *  string
+);
 /*
-static char * parson_strdup(const char *string);
 static int    hex_char_to_int(char c);
 static JSON_Status parse_utf16_hex(const char *string, unsigned int *result);
 static int         num_bytes_in_utf8_sequence(unsigned char c);
@@ -346,11 +349,19 @@ static char * parson_strndup(
     return output_string;
 }
 
-/*
-static char * parson_strdup(const char *string) {
-    return parson_strndup(string, strlen(string));
+static char * parson_strdup(
+    SceUID *        stringIdPtr
+    , const char *  string
+)
+{
+    return parson_strndup(
+        stringIdPtr
+        , string
+        , strlen( string )
+    );
 }
 
+/*
 static int hex_char_to_int(char c) {
     if (c >= '0' && c <= '9') {
         return c - '0';
