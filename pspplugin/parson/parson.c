@@ -136,15 +136,24 @@ struct json_value_t {
 };
 
 struct json_object_t {
-    JSON_Value    *wrapping_value;
-    size_t        *cells;
-    unsigned long *hashes;
-    char         **names;
-    JSON_Value   **values;
-    size_t        *cell_ixs;
-    size_t         count;
-    size_t         item_capacity;
-    size_t         cell_capacity;
+    JSON_Value *    wrapping_value;
+    SceUID          cellsId;
+    size_t *        cells;
+    SceUID          hashesId;
+    unsigned long * hashes;
+    SceUID          nameIdsId;
+    SceUID *        nameIds;
+    SceUID          namesId;
+    char **         names;
+    SceUID          valueIdsId;
+    SceUID *        valueIds;
+    SceUID          valuesId;
+    JSON_Value **   values;
+    SceUID          cell_ixsId;
+    size_t *        cell_ixs;
+    size_t          count;
+    size_t          item_capacity;
+    size_t          cell_capacity;
 };
 
 struct json_array_t {
@@ -510,14 +519,16 @@ static void json_object_deinit(
     , parson_bool_t free_values
 )
 {
-/*
     unsigned int i = 0;
-    for (i = 0; i < object->count; i++) {
-        if (free_keys) {
-            parson_free(object->names[i]);
+    for( i = 0 ; i < object->count ; i++ ) {
+        if( free_keys ) {
+            parson_free( object->nameIds[ i ] );
         }
-        if (free_values) {
-            json_value_free(object->values[i]);
+        if( free_values ) {
+            json_value_free(
+                object->valueIds[ i ]
+                , object->values[ i ]
+            );
         }
     }
 
@@ -525,18 +536,27 @@ static void json_object_deinit(
     object->item_capacity = 0;
     object->cell_capacity = 0;
 
-    parson_free(object->cells);
-    parson_free(object->names);
-    parson_free(object->values);
-    parson_free(object->cell_ixs);
-    parson_free(object->hashes);
+    parson_free( object->cellsId );
+    parson_free( object->nameIdsId );
+    parson_free( object->namesId );
+    parson_free( object->valueIdsId );
+    parson_free( object->valuesId );
+    parson_free( object->cell_ixsId );
+    parson_free( object->hashesId );
 
     object->cells = NULL;
     object->names = NULL;
     object->values = NULL;
     object->cell_ixs = NULL;
     object->hashes = NULL;
-*/
+
+    object->cellsId = 0;
+    object->nameIdsId = 0;
+    object->namesId = 0;
+    object->valueIdsId = 0;
+    object->valuesId = 0;
+    object->cell_ixsId = 0;
+    object->hashesId = 0;
 }
 
 /*
