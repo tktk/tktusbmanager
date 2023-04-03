@@ -172,8 +172,8 @@ struct json_array_t {
 // Various
 /*
 static char * read_file(const char *filename);
-static void   remove_comments(char *string, const char *start_token, const char *end_token);
 */
+static void   remove_comments(char *string, const char *start_token, const char *end_token);
 static char * parson_strndup(
     SceUID *        stringIdPtr
     , const char *  string
@@ -245,8 +245,12 @@ static JSON_Value *  parse_string_value(const char **string);
 static JSON_Value *  parse_boolean_value(const char **string);
 static JSON_Value *  parse_number_value(const char **string);
 static JSON_Value *  parse_null_value(const char **string);
-static JSON_Value *  parse_value(const char **string, size_t nesting);
 */
+static JSON_Value *  parse_value(
+    SceUID *        valueIdPtr
+    , const char ** string
+    , size_t        nesting
+);
 
 // Serialization
 /*
@@ -288,6 +292,7 @@ static char * read_file(const char * filename) {
     file_contents[size_read] = '\0';
     return file_contents;
 }
+*/
 
 static void remove_comments(char *string, const char *start_token, const char *end_token) {
     parson_bool_t in_string = PARSON_FALSE, escaped = PARSON_FALSE;
@@ -323,7 +328,6 @@ static void remove_comments(char *string, const char *start_token, const char *e
         string++;
     }
 }
-*/
 
 static char * parson_strndup(
     SceUID *        stringIdPtr
@@ -1026,8 +1030,17 @@ static char * get_quoted_string(const char **string, size_t *output_string_len) 
     input_string_len = *string - string_start - 2; // length without quotes
     return process_string(string_start + 1, input_string_len, output_string_len);
 }
+*/
 
-static JSON_Value * parse_value(const char **string, size_t nesting) {
+static JSON_Value * parse_value(
+    SceUID *        valueIdPtr
+    , const char ** string
+    , size_t        nesting
+)
+{
+    //TODO
+    return NULL;
+/*
     if (nesting > MAX_NESTING) {
         return NULL;
     }
@@ -1050,8 +1063,10 @@ static JSON_Value * parse_value(const char **string, size_t nesting) {
         default:
             return NULL;
     }
+*/
 }
 
+/*
 static JSON_Value * parse_object_value(const char **string, size_t nesting) {
     JSON_Status status = JSONFailure;
     JSON_Value *output_value = NULL, *new_value = NULL;
@@ -1507,22 +1522,38 @@ JSON_Value * json_parse_string_with_comments(
     , const char *  string
 )
 {
-    //TODO
-    return NULL;
-/*
-    JSON_Value *result = NULL;
-    char *string_mutable_copy = NULL, *string_mutable_copy_ptr = NULL;
-    string_mutable_copy = parson_strdup(string);
-    if (string_mutable_copy == NULL) {
+    SceUID  string_mutable_copyId = 0;
+    char *  string_mutable_copy = parson_strdup(
+        &string_mutable_copyId
+        , string
+    );
+    if( string_mutable_copy == NULL ) {
         return NULL;
     }
-    remove_comments(string_mutable_copy, "// ","");
-    remove_comments(string_mutable_copy, "//", "\n");
-    string_mutable_copy_ptr = string_mutable_copy;
-    result = parse_value((const char**)&string_mutable_copy_ptr, 0);
-    parson_free(string_mutable_copy);
-    return result;
-*/
+
+    remove_comments(
+        string_mutable_copy
+        , "// "
+        ,""
+    );
+    remove_comments(
+        string_mutable_copy
+        , "//"
+        , "\n"
+    );
+
+    SceUID  valueId = 0;
+    char *  string_mutable_copy_ptr = string_mutable_copy;
+    JSON_Value *    value = parse_value(
+        &valueId
+        , ( const char ** )&string_mutable_copy_ptr
+        , 0
+    );
+    *valueIdPtr = valueId;
+
+    parson_free( string_mutable_copyId );
+
+    return value;
 }
 
 // JSON Object API
