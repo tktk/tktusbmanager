@@ -158,31 +158,34 @@ static int readFile(
 }
 
 static int parseConfigFile(
-    SceUID *                    _configIdPtr
-    , TktUsbRepeaterConfig **   _configPtr
-    , const char *              _CONTENTS
+    TktUsbRepeaterConfig *  _config
+    , const char *          _CONTENTS
 )
 {
     //TODO
-    return 1;
+    return 0;
 /*
-    JSON_Value *    rootJson = json_parse_file_with_comments( _FILE_PATH );
+    SceUID  rootJsonId = 0;
+
+    JSON_Value *    rootJson = json_parse_file_with_comments(
+        &rootJsonId
+        , _FILE_PATH
+    );
     if( rootJson == NULL ) {
-        return NULL;
+        return 1;
     }
 
     TktUsbRepeaterConfig *  config = parseConfigJson( rootJson );
 
-    json_value_free( rootJson );
+    json_value_free( rootJsonId );
 
-    return config;
+    return 0;
 */
 }
 
 int loadConfigFile(
-    SceUID *                    _configIdPtr
-    , TktUsbRepeaterConfig **   _configPtr
-    , const char *              _FILE_PATH
+    TktUsbRepeaterConfig *  _config
+    , const char *          _FILE_PATH
 )
 {
     int result;
@@ -197,8 +200,7 @@ int loadConfigFile(
     );
     if( result == 0 ) {
         result = parseConfigFile(
-            _configIdPtr
-            , _configPtr
+            _config
             , contents
         );
     }
@@ -209,14 +211,8 @@ int loadConfigFile(
 }
 
 void unloadConfig(
-    SceUID *                    _configIdPtr
-    , TktUsbRepeaterConfig **   _configPtr
+    TktUsbRepeaterConfig *  _config
 )
 {
     //TODO エンドポイント情報解放
-
-    sceKernelFreePartitionMemory( *_configIdPtr );
-
-    *_configIdPtr = 0;
-    *_configPtr = NULL;
 }

@@ -2,7 +2,6 @@
 #define TKTUSBREPEATER_CONFIG_H
 
 #include "tktusbrepeater/endpoints.h"
-#include <pspkerneltypes.h>
 
 typedef struct
 {
@@ -10,14 +9,12 @@ typedef struct
 } TktUsbRepeaterConfig;
 
 int loadConfigFile(
-    SceUID *
-    , TktUsbRepeaterConfig **
+    TktUsbRepeaterConfig *
     , const char *
 );
 
 void unloadConfig(
-    SceUID *
-    , TktUsbRepeaterConfig **
+    TktUsbRepeaterConfig *
 );
 
 #endif  // TKTUSBREPEATER_CONFIG_H

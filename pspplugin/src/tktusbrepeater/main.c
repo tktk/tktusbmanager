@@ -18,8 +18,7 @@ enum {
     TKTUSBREPEATER_DRIVERPID = 0x1c9,
 };
 
-static SceUID                   configId = 0;
-static TktUsbRepeaterConfig *   config = NULL;
+static TktUsbRepeaterConfig config;
 
 int module_start(
     SceSize     _args
@@ -29,8 +28,7 @@ int module_start(
     initializeParson();
 
     if( loadConfigFile(
-        &configId
-        , &config
+        &config
         , CONFIG_FILE_PATH
     ) != 0 ) {
         return 0;
@@ -72,10 +70,7 @@ int module_stop(
     //TODO USB無効化
     //TODO USBドライバの登録解除
 
-    unloadConfig(
-        &configId
-        , &config
-    );
+    unloadConfig( &config );
 
     return 0;
 }
