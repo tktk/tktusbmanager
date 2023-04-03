@@ -77,7 +77,11 @@ typedef int (*JSON_Number_Serialization_Function)(double num, char *buf);
 
 /* Call only once, before calling any other function from parson API. If not called, malloc and free
    from stdlib will be used for all allocations */
-void json_set_allocation_functions(JSON_Malloc_Function malloc_fun, JSON_Free_Function free_fun);
+void json_set_allocation_functions(
+    JSON_Malloc_Function malloc_fun
+    , JSON_Free_Function free_fun
+    , JSON_GetAddr_Function get_addr_fun
+);
 
 /* Sets if slashes should be escaped or not when serializing JSON. By default slashes are escaped.
  This function sets a global setting and is not thread safe. */
