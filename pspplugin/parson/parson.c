@@ -118,15 +118,18 @@ typedef struct json_string {
 
 // Type definitions
 typedef union json_value_value {
-    JSON_String  string;
-    double       number;
+    JSON_String string;
+    double      number;
     struct {
         SceUID          objectId;
         JSON_Object *   object;
     };
-    JSON_Array  *array;
-    int          boolean;
-    int          null;
+    struct {
+        SceUID          arrayId;
+        JSON_Array *    array;
+    };
+    int         boolean;
+    int         null;
 } JSON_Value_Value;
 
 struct json_value_t {
@@ -157,10 +160,13 @@ struct json_object_t {
 };
 
 struct json_array_t {
-    JSON_Value  *wrapping_value;
-    JSON_Value **items;
-    size_t       count;
-    size_t       capacity;
+    JSON_Value *    wrapping_value;
+    SceUID          itemIdsId;
+    SceUID *        itemIds;
+    SceUID          itemsId;
+    JSON_Value **   items;
+    size_t          count;
+    size_t          capacity;
 };
 
 // Various
@@ -206,8 +212,11 @@ static void          json_object_free(
 static JSON_Array * json_array_make(JSON_Value *wrapping_value);
 static JSON_Status  json_array_add(JSON_Array *array, JSON_Value *value);
 static JSON_Status  json_array_resize(JSON_Array *array, size_t new_capacity);
-static void         json_array_free(JSON_Array *array);
 */
+static void json_array_free(
+    SceUID          arrayId
+    , JSON_Array *  array
+);
 
 // JSON Value
 /*
@@ -808,16 +817,25 @@ static JSON_Status json_array_resize(JSON_Array *array, size_t new_capacity) {
     array->capacity = new_capacity;
     return JSONSuccess;
 }
-
-static void json_array_free(JSON_Array *array) {
-    size_t i;
-    for (i = 0; i < array->count; i++) {
-        json_value_free(array->items[i]);
-    }
-    parson_free(array->items);
-    parson_free(array);
-}
 */
+
+static void json_array_free(
+    SceUID          arrayId
+    , JSON_Array *  array
+)
+{
+    size_t i;
+    for( i = 0 ; i < array->count ; i++ ) {
+        json_value_free(
+            array->itemIds[ i ]
+            , array->items[ i ]
+        );
+    }
+
+    parson_free( array->itemIdsId );
+    parson_free( array->itemsId );
+    parson_free( arrayId );
+}
 
 // JSON Value
 /*
@@ -1681,11 +1699,12 @@ void json_value_free(
         case JSONString:
             parson_free( valueValue->string.charsId );
             break;
-/*
         case JSONArray:
-            json_array_free( value->value.array );
+            json_array_free(
+                valueValue->arrayId
+                , valueValue->array
+            );
             break;
-*/
         default:
             break;
     }
