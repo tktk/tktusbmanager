@@ -2077,22 +2077,37 @@ void json_value_free(
     parson_free( valueId );
 }
 
-/*
-JSON_Value * json_value_init_object(void) {
-    JSON_Value *new_value = (JSON_Value*)parson_malloc(sizeof(JSON_Value));
-    if (!new_value) {
+JSON_Value * json_value_init_object(
+    SceUID *    valueIdPtr
+)
+{
+    SceUID  valueId = parson_malloc( sizeof( JSON_Value ) );
+
+    JSON_Value *    new_value = ( JSON_Value * )parson_get_addr( valueId );
+    if( !new_value ) {
         return NULL;
     }
+
+    SceUID  objectId = 0;
+
+    JSON_Object *   object = json_object_make(
+        &objectId
+        , new_value
+    );
+
+    if( !object ) {
+        parson_free( valueId );
+        return NULL;
+    }
+    *valueIdPtr = valueId;
+
     new_value->parent = NULL;
     new_value->type = JSONObject;
-    new_value->value.object = json_object_make(new_value);
-    if (!new_value->value.object) {
-        parson_free(new_value);
-        return NULL;
-    }
+    new_value->value.objectId = objectId;
+    new_value->value.object = object;
+
     return new_value;
 }
-*/
 
 JSON_Value * json_value_init_array(
     SceUID *    valueIdPtr

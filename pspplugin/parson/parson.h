@@ -248,7 +248,9 @@ JSON_Status json_array_append_null(JSON_Array *array);
 /*
  *JSON Value
  */
-JSON_Value * json_value_init_object (void);
+JSON_Value * json_value_init_object(
+    SceUID *    valueIdPtr
+);
 JSON_Value * json_value_init_array(
     SceUID *    valueIdPtr
 );
