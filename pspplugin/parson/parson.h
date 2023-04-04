@@ -256,7 +256,10 @@ JSON_Value * json_value_init_number(
     SceUID *    valueIdPtr
     , double    number
 );
-JSON_Value * json_value_init_boolean(int boolean);
+JSON_Value * json_value_init_boolean(
+    SceUID *    valueIdPtr
+    , int       boolean
+);
 JSON_Value * json_value_init_null(
     SceUID *    valueIdPtr
 );

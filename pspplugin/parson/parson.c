@@ -1080,6 +1080,7 @@ static JSON_Value * parse_value(
 }
 
 /*
+//TODO
 static JSON_Value * parse_object_value(const char **string, size_t nesting) {
     JSON_Status status = JSONFailure;
     JSON_Value *output_value = NULL, *new_value = NULL;
@@ -1153,6 +1154,7 @@ static JSON_Value * parse_object_value(const char **string, size_t nesting) {
     return output_value;
 }
 
+//TODO
 static JSON_Value * parse_array_value(const char **string, size_t nesting) {
     JSON_Value *output_value = NULL, *new_array_value = NULL;
     JSON_Array *output_array = NULL;
@@ -1202,6 +1204,7 @@ static JSON_Value * parse_array_value(const char **string, size_t nesting) {
     return output_value;
 }
 
+//TODO
 static JSON_Value * parse_string_value(const char **string) {
     JSON_Value *value = NULL;
     size_t new_string_len = 0;
@@ -1217,6 +1220,7 @@ static JSON_Value * parse_string_value(const char **string) {
     return value;
 }
 
+//TODO
 static JSON_Value * parse_boolean_value(const char **string) {
     size_t true_token_size = SIZEOF_TOKEN("true");
     size_t false_token_size = SIZEOF_TOKEN("false");
@@ -1895,18 +1899,24 @@ JSON_Value * json_value_init_number(
     return new_value;
 }
 
-/*
-JSON_Value * json_value_init_boolean(int boolean) {
-    JSON_Value *new_value = (JSON_Value*)parson_malloc(sizeof(JSON_Value));
-    if (!new_value) {
+JSON_Value * json_value_init_boolean(
+    SceUID *    valueIdPtr
+    , int       boolean
+)
+{
+    SceUID  valueId = parson_malloc( sizeof( JSON_Value ) );
+
+    JSON_Value *    new_value = ( JSON_Value * )parson_get_addr( valueId );
+    if( !new_value ) {
         return NULL;
     }
+    *valueIdPtr = valueId;
+
     new_value->parent = NULL;
     new_value->type = JSONBoolean;
     new_value->value.boolean = boolean ? 1 : 0;
     return new_value;
 }
-*/
 
 JSON_Value * json_value_init_null(
     SceUID *    valueIdPtr
