@@ -1937,22 +1937,40 @@ JSON_Value * json_value_init_object(void) {
     }
     return new_value;
 }
+*/
 
-JSON_Value * json_value_init_array(void) {
-    JSON_Value *new_value = (JSON_Value*)parson_malloc(sizeof(JSON_Value));
-    if (!new_value) {
+JSON_Value * json_value_init_array(
+    SceUID *    valueIdPtr
+)
+{
+    SceUID  valueId = parson_malloc( sizeof( JSON_Value ) );
+
+    JSON_Value *    new_value = ( JSON_Value * )parson_get_addr( valueId );
+    if( !new_value ) {
         return NULL;
     }
+
+    SceUID  arrayId = 0;
+
+    JSON_Array *    array = json_array_make(
+        &( arrayId )
+        , new_value
+    );
+    if( !array ) {
+        parson_free( valueId );
+        return NULL;
+    }
+    *valueIdPtr = valueId;
+
     new_value->parent = NULL;
     new_value->type = JSONArray;
-    new_value->value.array = json_array_make(new_value);
-    if (!new_value->value.array) {
-        parson_free(new_value);
-        return NULL;
-    }
+    new_value->value.arrayId = arrayId;
+    new_value->value.array = array;
+
     return new_value;
 }
 
+/*
 JSON_Value * json_value_init_string(const char *string) {
     if (string == NULL) {
         return NULL;
@@ -1984,7 +2002,8 @@ JSON_Value * json_value_init_string_with_len(const char *string, size_t length) 
 JSON_Value * json_value_init_number(
     SceUID *    valueIdPtr
     , double    number
-) {
+)
+{
     if( IS_NUMBER_INVALID( number ) ) {
         return NULL;
     }

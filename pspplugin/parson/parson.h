@@ -249,7 +249,9 @@ JSON_Status json_array_append_null(JSON_Array *array);
  *JSON Value
  */
 JSON_Value * json_value_init_object (void);
-JSON_Value * json_value_init_array  (void);
+JSON_Value * json_value_init_array(
+    SceUID *    valueIdPtr
+);
 JSON_Value * json_value_init_string (const char *string); /* copies passed string */
 JSON_Value * json_value_init_string_with_len(const char *string, size_t length); /* copies passed string, length shouldn't include last null character */
 JSON_Value * json_value_init_number(
