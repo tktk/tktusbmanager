@@ -201,9 +201,12 @@ static unsigned long hash_string(const char *string, size_t n);
 // JSON Object
 /*
 static JSON_Object * json_object_make(JSON_Value *wrapping_value);
-static JSON_Status   json_object_init(JSON_Object *object, size_t capacity);
 */
-static void          json_object_deinit(
+static JSON_Status json_object_init(
+    JSON_Object *   object
+    , size_t        capacity
+);
+static void json_object_deinit(
     JSON_Object *   object
     , parson_bool_t free_keys
     , parson_bool_t free_values
@@ -216,7 +219,7 @@ static JSON_Value  * json_object_getn_value(const JSON_Object *object, const cha
 static JSON_Status   json_object_remove_internal(JSON_Object *object, const char *name, parson_bool_t free_value);
 static JSON_Status   json_object_dotremove_internal(JSON_Object *object, const char *name, parson_bool_t free_value);
 */
-static void          json_object_free(
+static void json_object_free(
     SceUID          objectId
     , JSON_Object * object
 );
@@ -555,49 +558,108 @@ static JSON_Object * json_object_make(JSON_Value *wrapping_value) {
     }
     return new_obj;
 }
+*/
 
-static JSON_Status json_object_init(JSON_Object *object, size_t capacity) {
-    unsigned int i = 0;
-
-    object->cells = NULL;
-    object->names = NULL;
-    object->values = NULL;
-    object->cell_ixs = NULL;
-    object->hashes = NULL;
+static JSON_Status json_object_init(
+    JSON_Object *   object
+    , size_t        capacity
+)
+{
+    object->cellsId = 0;
+    object->nameIdsId = 0;
+    object->namesId = 0;
+    object->valueIdsId = 0;
+    object->valuesId = 0;
+    object->cell_ixsId = 0;
+    object->hashesId = 0;
 
     object->count = 0;
     object->cell_capacity = capacity;
-    object->item_capacity = (unsigned int)(capacity * 0.7f);
+    object->item_capacity = ( unsigned int )( capacity * 0.7f );
 
-    if (capacity == 0) {
+    if( capacity == 0 ) {
         return JSONSuccess;
     }
 
-    object->cells = (size_t*)parson_malloc(object->cell_capacity * sizeof(*object->cells));
-    object->names = (char**)parson_malloc(object->item_capacity * sizeof(*object->names));
-    object->values = (JSON_Value**)parson_malloc(object->item_capacity * sizeof(*object->values));
-    object->cell_ixs = (size_t*)parson_malloc(object->item_capacity * sizeof(*object->cell_ixs));
-    object->hashes = (unsigned long*)parson_malloc(object->item_capacity * sizeof(*object->hashes));
-    if (object->cells == NULL
+#define MALLOC_OBJECT_ELEMENT( \
+    _TYPE \
+    , _CAPACITY \
+    , _id \
+    , _element \
+) \
+    object->_id = parson_malloc( object->_CAPACITY * sizeof( *( object->_element ) ) ); \
+    object->_element = ( _TYPE * )parson_get_addr( object->_id ); \
+
+    MALLOC_OBJECT_ELEMENT(
+        size_t
+        , cell_capacity
+        , cellsId
+        , cells
+    )
+    MALLOC_OBJECT_ELEMENT(
+        SceUID
+        , item_capacity
+        , nameIdsId
+        , nameIds
+    )
+    MALLOC_OBJECT_ELEMENT(
+        char *
+        , item_capacity
+        , namesId
+        , names
+    )
+    MALLOC_OBJECT_ELEMENT(
+        SceUID
+        , item_capacity
+        , valueIdsId
+        , valueIds
+    )
+    MALLOC_OBJECT_ELEMENT(
+        JSON_Value *
+        , item_capacity
+        , valuesId
+        , values
+    )
+    MALLOC_OBJECT_ELEMENT(
+        size_t
+        , item_capacity
+        , cell_ixsId
+        , cell_ixs
+    )
+    MALLOC_OBJECT_ELEMENT(
+        unsigned long
+        , item_capacity
+        , hashesId
+        , hashes
+    )
+#undef  MALLOC_OBJECT_ELEMENT
+    if( object->cells == NULL
+        || object->nameIds == NULL
         || object->names == NULL
+        || object->valueIds == NULL
         || object->values == NULL
         || object->cell_ixs == NULL
-        || object->hashes == NULL) {
+        || object->hashes == NULL
+    ) {
         goto error;
     }
-    for (i = 0; i < object->cell_capacity; i++) {
-        object->cells[i] = OBJECT_INVALID_IX;
+    unsigned int    i;
+    for( i = 0 ; i < object->cell_capacity ; i++ ) {
+        object->cells[ i ] = OBJECT_INVALID_IX;
     }
+
     return JSONSuccess;
+
 error:
-    parson_free(object->cells);
-    parson_free(object->names);
-    parson_free(object->values);
-    parson_free(object->cell_ixs);
-    parson_free(object->hashes);
+    parson_free( object->cellsId );
+    parson_free( object->nameIdsId );
+    parson_free( object->namesId );
+    parson_free( object->valueIdsId );
+    parson_free( object->valuesId );
+    parson_free( object->cell_ixsId );
+    parson_free( object->hashesId );
     return JSONFailure;
 }
-*/
 
 static void json_object_deinit(
     JSON_Object *   object
@@ -631,7 +693,9 @@ static void json_object_deinit(
     parson_free( object->hashesId );
 
     object->cells = NULL;
+    object->nameIds = NULL;
     object->names = NULL;
+    object->valueIds = NULL;
     object->values = NULL;
     object->cell_ixs = NULL;
     object->hashes = NULL;
