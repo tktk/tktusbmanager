@@ -228,8 +228,11 @@ static JSON_Array * json_array_make(
 );
 /*
 static JSON_Status  json_array_add(JSON_Array *array, JSON_Value *value);
-static JSON_Status  json_array_resize(JSON_Array *array, size_t new_capacity);
 */
+static JSON_Status json_array_resize(
+    JSON_Array *    array
+    , size_t        new_capacity
+);
 static void json_array_free(
     SceUID          arrayId
     , JSON_Array *  array
@@ -879,25 +882,56 @@ static JSON_Status json_array_add(JSON_Array *array, JSON_Value *value) {
     array->count++;
     return JSONSuccess;
 }
+*/
 
-static JSON_Status json_array_resize(JSON_Array *array, size_t new_capacity) {
-    JSON_Value **new_items = NULL;
-    if (new_capacity == 0) {
+static JSON_Status json_array_resize(
+    JSON_Array *    array
+    , size_t        new_capacity
+)
+{
+    if( new_capacity == 0 ) {
         return JSONFailure;
     }
-    new_items = (JSON_Value**)parson_malloc(new_capacity * sizeof(JSON_Value*));
-    if (new_items == NULL) {
+
+    SceUID  new_itemsId = parson_malloc( new_capacity * sizeof( JSON_Value * ) );
+
+    JSON_Value **   new_items = ( JSON_Value ** )parson_get_addr( new_itemsId );
+    if( new_items == NULL ) {
         return JSONFailure;
     }
-    if (array->items != NULL && array->count > 0) {
-        memcpy(new_items, array->items, array->count * sizeof(JSON_Value*));
+
+    SceUID  new_itemIdsId = parson_malloc( new_capacity * sizeof( SceUID ) );
+
+    SceUID *    new_itemIds = ( SceUID * )parson_get_addr( new_itemIdsId );
+    if( new_itemIds == NULL ) {
+        parson_free( new_itemsId );
+        return JSONFailure;
     }
-    parson_free(array->items);
+
+    if( array->items != NULL && array->count > 0 ) {
+        memcpy(
+            new_itemIds
+            , array->itemIds
+            , array->count * sizeof( SceUID )
+        );
+        memcpy(
+            new_items
+            , array->items
+            , array->count * sizeof( JSON_Value * )
+        );
+    }
+
+    parson_free( array->itemIdsId );
+    parson_free( array->itemsId );
+
+    array->itemIdsId = new_itemIdsId;
+    array->itemIds = new_itemIds;
+    array->itemsId = new_itemsId;
     array->items = new_items;
     array->capacity = new_capacity;
+
     return JSONSuccess;
 }
-*/
 
 static void json_array_free(
     SceUID          arrayId
@@ -1860,11 +1894,13 @@ JSON_Value_Type json_value_get_type(const JSON_Value *value) {
 JSON_Object * json_value_get_object(const JSON_Value *value) {
     return json_value_get_type(value) == JSONObject ? value->value.object : NULL;
 }
+*/
 
 JSON_Array * json_value_get_array(const JSON_Value *value) {
     return json_value_get_type(value) == JSONArray ? value->value.array : NULL;
 }
 
+/*
 static const JSON_String * json_value_get_string_desc(const JSON_Value *value) {
     return json_value_get_type(value) == JSONString ? &value->value.string : NULL;
 }
