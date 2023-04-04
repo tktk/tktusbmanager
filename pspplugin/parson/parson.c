@@ -244,8 +244,11 @@ static JSON_Value *  parse_array_value(const char **string, size_t nesting);
 static JSON_Value *  parse_string_value(const char **string);
 static JSON_Value *  parse_boolean_value(const char **string);
 static JSON_Value *  parse_number_value(const char **string);
-static JSON_Value *  parse_null_value(const char **string);
 */
+static JSON_Value *  parse_null_value(
+    SceUID *        valueIdPtr
+    , const char ** string
+);
 static JSON_Value *  parse_value(
     SceUID *        valueIdPtr
     , const char ** string
@@ -1231,16 +1234,20 @@ static JSON_Value * parse_number_value(const char **string) {
     *string = end;
     return json_value_init_number(number);
 }
+*/
 
-static JSON_Value * parse_null_value(const char **string) {
+static JSON_Value * parse_null_value(
+    SceUID *        valueIdPtr
+    , const char ** string
+)
+{
     size_t token_size = SIZEOF_TOKEN("null");
     if (strncmp("null", *string, token_size) == 0) {
         *string += token_size;
-        return json_value_init_null();
+        return json_value_init_null( valueIdPtr );
     }
     return NULL;
 }
-*/
 
 // Serialization
 
