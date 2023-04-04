@@ -186,9 +186,9 @@ static char * parson_strdup(
     SceUID *        stringIdPtr
     , const char *  string
 );
-/*
 static int    hex_char_to_int(char c);
 static JSON_Status parse_utf16_hex(const char *string, unsigned int *result);
+/*
 static int         num_bytes_in_utf8_sequence(unsigned char c);
 static JSON_Status   verify_utf8_sequence(const unsigned char *string, int *len);
 static parson_bool_t is_valid_utf8(const char *string, size_t string_len);
@@ -245,24 +245,39 @@ static const JSON_String * json_value_get_string_desc(const JSON_Value *value);
 
 // Parser
 static JSON_Status   skip_quotes(const char **string);
-/*
 static JSON_Status   parse_utf16(const char **unprocessed, char **processed);
-static char *        process_string(const char *input, size_t input_len, size_t *output_len);
-static char *        get_quoted_string(const char **string, size_t *output_string_len);
+static char * process_string(
+    SceUID *        outputIdPtr
+    , size_t *      output_len
+    , const char *  input
+    , size_t        input_len
+);
+static char * get_quoted_string(
+    SceUID *        output_stringId
+    , size_t *      output_string_len
+    , const char ** string
+);
+/*
 static JSON_Value *  parse_object_value(const char **string, size_t nesting);
 static JSON_Value *  parse_array_value(const char **string, size_t nesting);
-static JSON_Value *  parse_string_value(const char **string);
-static JSON_Value *  parse_boolean_value(const char **string);
 */
+static JSON_Value * parse_string_value(
+    SceUID *        valueIdPtr
+    , const char ** string
+);
+static JSON_Value * parse_boolean_value(
+    SceUID *        valueIdPtr
+    , const char ** string
+);
 static JSON_Value * parse_number_value(
     SceUID *        valueIdPtr
     , const char ** string
 );
-static JSON_Value *  parse_null_value(
+static JSON_Value * parse_null_value(
     SceUID *        valueIdPtr
     , const char ** string
 );
-static JSON_Value *  parse_value(
+static JSON_Value * parse_value(
     SceUID *        valueIdPtr
     , const char ** string
     , size_t        nesting
@@ -381,7 +396,6 @@ static char * parson_strdup(
     );
 }
 
-/*
 static int hex_char_to_int(char c) {
     if (c >= '0' && c <= '9') {
         return c - '0';
@@ -409,6 +423,7 @@ static JSON_Status parse_utf16_hex(const char *s, unsigned int *result) {
     return JSONSuccess;
 }
 
+/*
 static int num_bytes_in_utf8_sequence(unsigned char c) {
     if (c == 0xC0 || c == 0xC1 || c > 0xF4 || IS_CONT(c)) {
         return 0;
@@ -939,7 +954,6 @@ static JSON_Status skip_quotes(const char **string) {
     return JSONSuccess;
 }
 
-/*
 static JSON_Status parse_utf16(const char **unprocessed, char **processed) {
     unsigned int cp, lead, trail;
     char *processed_ptr = *processed;
@@ -985,26 +999,31 @@ static JSON_Status parse_utf16(const char **unprocessed, char **processed) {
     *unprocessed = unprocessed_ptr;
     return JSONSuccess;
 }
-*/
 
 
 /* Copies and processes passed string up to supplied length.
 Example: "\u006Corem ipsum" -> lorem ipsum */
-/*
-static char* process_string(const char *input, size_t input_len, size_t *output_len) {
+static char * process_string(
+    SceUID *        outputIdPtr
+    , size_t *      output_len
+    , const char *  input
+    , size_t        input_len
+)
+{
     const char *input_ptr = input;
-    size_t initial_size = (input_len + 1) * sizeof(char);
-    size_t final_size = 0;
-    char *output = NULL, *output_ptr = NULL, *resized_output = NULL;
-    output = (char*)parson_malloc(initial_size);
-    if (output == NULL) {
+
+    const size_t    INITIAL_SIZE = ( input_len + 1 ) * sizeof( char );
+
+    SceUID  outputId = parson_malloc( INITIAL_SIZE );
+    char *  output = ( char * )parson_get_addr( outputId );
+    if( output == NULL ) {
         goto error;
     }
-    output_ptr = output;
-    while ((*input_ptr != '\0') && (size_t)(input_ptr - input) < input_len) {
-        if (*input_ptr == '\\') {
+    char *  output_ptr = output;
+    while( ( *input_ptr != '\0' ) && ( size_t )( input_ptr - input ) < input_len ) {
+        if( *input_ptr == '\\' ) {
             input_ptr++;
-            switch (*input_ptr) {
+            switch( *input_ptr ) {
                 case '\"': *output_ptr = '\"'; break;
                 case '\\': *output_ptr = '\\'; break;
                 case '/':  *output_ptr = '/';  break;
@@ -1014,14 +1033,17 @@ static char* process_string(const char *input, size_t input_len, size_t *output_
                 case 'r':  *output_ptr = '\r'; break;
                 case 't':  *output_ptr = '\t'; break;
                 case 'u':
-                    if (parse_utf16(&input_ptr, &output_ptr) != JSONSuccess) {
+                    if( parse_utf16(
+                        &input_ptr
+                        , &output_ptr
+                    ) != JSONSuccess ) {
                         goto error;
                     }
                     break;
                 default:
                     goto error;
             }
-        } else if ((unsigned char)*input_ptr < 0x20) {
+        } else if( ( unsigned char )( *input_ptr ) < 0x20 ) {
             goto error; // 0x00-0x19 are invalid characters for json string (http://www.ietf.org/rfc/rfc4627.txt)
         } else {
             *output_ptr = *input_ptr;
@@ -1031,36 +1053,50 @@ static char* process_string(const char *input, size_t input_len, size_t *output_
     }
     *output_ptr = '\0';
     // resize to new length
-    final_size = (size_t)(output_ptr-output) + 1;
-    // todo: don't resize if final_size == initial_size
-    resized_output = (char*)parson_malloc(final_size);
-    if (resized_output == NULL) {
+    const size_t    FINAL_SIZE = ( size_t )( output_ptr - output ) + 1;
+    // todo: don't resize if FINAL_SIZE == initial_size
+    SceUID  resized_outputId = parson_malloc( FINAL_SIZE );
+    char *  resized_output = ( char * )parson_get_addr( resized_outputId );
+    if( resized_output == NULL ) {
         goto error;
     }
-    memcpy(resized_output, output, final_size);
-    *output_len = final_size - 1;
-    parson_free(output);
+    *outputIdPtr = resized_outputId;
+    memcpy(
+        resized_output
+        , output
+        , FINAL_SIZE
+    );
+    *output_len = FINAL_SIZE - 1;
+    parson_free( outputId );
     return resized_output;
 error:
-    parson_free(output);
+    parson_free( outputId );
     return NULL;
 }
-*/
 
 /* Return processed contents of a string between quotes and
    skips passed argument to a matching quote. */
-/*
-static char * get_quoted_string(const char **string, size_t *output_string_len) {
-    const char *string_start = *string;
-    size_t input_string_len = 0;
+static char * get_quoted_string(
+    SceUID *        output_stringId
+    , size_t *      output_string_len
+    , const char ** string
+)
+{
+    const char *    string_start = *string;
+
     JSON_Status status = skip_quotes(string);
-    if (status != JSONSuccess) {
+    if( status != JSONSuccess ) {
         return NULL;
     }
-    input_string_len = *string - string_start - 2; // length without quotes
-    return process_string(string_start + 1, input_string_len, output_string_len);
+
+    const size_t    INPUT_STRING_LEN = *string - string_start - 2; // length without quotes
+    return process_string(
+        output_stringId
+        , output_string_len
+        , string_start + 1
+        , INPUT_STRING_LEN
+    );
 }
-*/
 
 static JSON_Value * parse_value(
     SceUID *        valueIdPtr
@@ -1220,23 +1256,41 @@ static JSON_Value * parse_array_value(const char **string, size_t nesting) {
     SKIP_CHAR(string);
     return output_value;
 }
+*/
 
-//TODO
-static JSON_Value * parse_string_value(const char **string) {
-    JSON_Value *value = NULL;
-    size_t new_string_len = 0;
-    char *new_string = get_quoted_string(string, &new_string_len);
-    if (new_string == NULL) {
+static JSON_Value * parse_string_value(
+    SceUID *        valueIdPtr
+    , const char ** string
+)
+{
+    SceUID  new_stringId = 0;
+    size_t  new_string_len = 0;
+
+    char *  new_string = get_quoted_string(
+        &new_stringId
+        , &new_string_len
+        , string
+    );
+    if( new_string == NULL ) {
         return NULL;
     }
-    value = json_value_init_string_no_copy(new_string, new_string_len);
-    if (value == NULL) {
-        parson_free(new_string);
+
+    SceUID  valueId = 0;
+
+    JSON_Value *    value = json_value_init_string_no_copy(
+        &valueId
+        , new_stringId
+        , new_string
+        , new_string_len
+    );
+    if( value == NULL ) {
+        parson_free( new_stringId );
         return NULL;
     }
+    *valueIdPtr = valueId;
+
     return value;
 }
-*/
 
 #define TRUE_TOKEN "true"
 #define FALSE_TOKEN "false"
