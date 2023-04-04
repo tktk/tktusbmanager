@@ -1866,17 +1866,25 @@ JSON_Value * json_value_init_boolean(int boolean) {
     new_value->value.boolean = boolean ? 1 : 0;
     return new_value;
 }
+*/
 
-JSON_Value * json_value_init_null(void) {
-    JSON_Value *new_value = (JSON_Value*)parson_malloc(sizeof(JSON_Value));
-    if (!new_value) {
+JSON_Value * json_value_init_null(
+    SceUID *    valueIdPtr
+)
+{
+    SceUID  valueId = parson_malloc( sizeof( JSON_Value ) );
+    JSON_Value *new_value = parson_get_addr( valueId );
+    if( !new_value ) {
         return NULL;
     }
+    *valueIdPtr = valueId;
+
     new_value->parent = NULL;
     new_value->type = JSONNull;
     return new_value;
 }
 
+/*
 JSON_Value * json_value_deep_copy(const JSON_Value *value) {
     size_t i = 0;
     JSON_Value *return_value = NULL, *temp_value_copy = NULL, *temp_value = NULL;

@@ -254,7 +254,9 @@ JSON_Value * json_value_init_string (const char *string); /* copies passed strin
 JSON_Value * json_value_init_string_with_len(const char *string, size_t length); /* copies passed string, length shouldn't include last null character */
 JSON_Value * json_value_init_number (double number);
 JSON_Value * json_value_init_boolean(int boolean);
-JSON_Value * json_value_init_null   (void);
+JSON_Value * json_value_init_null   (
+    SceUID *    valueIdPtr
+);
 JSON_Value * json_value_deep_copy   (const JSON_Value *value);
 void         json_value_free        (
     SceUID          valueId
