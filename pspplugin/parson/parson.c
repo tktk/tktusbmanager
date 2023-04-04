@@ -83,9 +83,6 @@
 #undef malloc
 #undef free
 
-#undef  isnan
-#undef  isinf
-
 #if defined(isnan) && defined(isinf)
 #define IS_NUMBER_INVALID(x) (isnan((x)) || isinf((x)))
 #else
@@ -1199,24 +1196,24 @@ static char * process_string(
         if( *input_ptr == '\\' ) {
             input_ptr++;
             switch( *input_ptr ) {
-                case '\"': *output_ptr = '\"'; break;
-                case '\\': *output_ptr = '\\'; break;
-                case '/':  *output_ptr = '/';  break;
-                case 'b':  *output_ptr = '\b'; break;
-                case 'f':  *output_ptr = '\f'; break;
-                case 'n':  *output_ptr = '\n'; break;
-                case 'r':  *output_ptr = '\r'; break;
-                case 't':  *output_ptr = '\t'; break;
-                case 'u':
-                    if( parse_utf16(
-                        &input_ptr
-                        , &output_ptr
-                    ) != JSONSuccess ) {
-                        goto error;
-                    }
-                    break;
-                default:
+            case '\"': *output_ptr = '\"'; break;
+            case '\\': *output_ptr = '\\'; break;
+            case '/':  *output_ptr = '/';  break;
+            case 'b':  *output_ptr = '\b'; break;
+            case 'f':  *output_ptr = '\f'; break;
+            case 'n':  *output_ptr = '\n'; break;
+            case 'r':  *output_ptr = '\r'; break;
+            case 't':  *output_ptr = '\t'; break;
+            case 'u':
+                if( parse_utf16(
+                    &input_ptr
+                    , &output_ptr
+                ) != JSONSuccess ) {
                     goto error;
+                }
+                break;
+            default:
+                goto error;
             }
         } else if( ( unsigned char )( *input_ptr ) < 0x20 ) {
             goto error; // 0x00-0x19 are invalid characters for json string (http://www.ietf.org/rfc/rfc4627.txt)
@@ -1279,32 +1276,48 @@ static JSON_Value * parse_value(
     , size_t        nesting
 )
 {
-    //TODO
-    return NULL;
-/*
-    if (nesting > MAX_NESTING) {
+    if( nesting > MAX_NESTING ) {
         return NULL;
     }
-    SKIP_WHITESPACES(string);
-    switch (**string) {
-        case '{':
-            return parse_object_value(string, nesting + 1);
-        case '[':
-            return parse_array_value(string, nesting + 1);
-        case '\"':
-            return parse_string_value(string);
-        case 'f': case 't':
-            return parse_boolean_value(string);
-        case '-':
-        case '0': case '1': case '2': case '3': case '4':
-        case '5': case '6': case '7': case '8': case '9':
-            return parse_number_value(string);
-        case 'n':
-            return parse_null_value(string);
-        default:
-            return NULL;
+    SKIP_WHITESPACES( string );
+    switch( **string ) {
+    case '{':
+        return parse_object_value(
+            valueIdPtr
+            , string
+            , nesting + 1
+        );
+    case '[':
+        return parse_array_value(
+            valueIdPtr
+            , string
+            , nesting + 1
+        );
+    case '\"':
+        return parse_string_value(
+            valueIdPtr
+            , string
+        );
+    case 'f': case 't':
+        return parse_boolean_value(
+            valueIdPtr
+            , string
+        );
+    case '-':
+    case '0': case '1': case '2': case '3': case '4':
+    case '5': case '6': case '7': case '8': case '9':
+        return parse_number_value(
+            valueIdPtr
+            , string
+        );
+    case 'n':
+        return parse_null_value(
+            valueIdPtr
+            , string
+        );
+    default:
+        return NULL;
     }
-*/
 }
 
 static JSON_Value * parse_object_value(
@@ -2143,23 +2156,23 @@ void json_value_free(
     JSON_Value_Value *  valueValue = &( value->value );
 
     switch( json_value_get_type( value ) ) {
-        case JSONObject:
-            json_object_free(
-                valueValue->objectId
-                , valueValue->object
-            );
-            break;
-        case JSONString:
-            parson_free( valueValue->string.charsId );
-            break;
-        case JSONArray:
-            json_array_free(
-                valueValue->arrayId
-                , valueValue->array
-            );
-            break;
-        default:
-            break;
+    case JSONObject:
+        json_object_free(
+            valueValue->objectId
+            , valueValue->object
+        );
+        break;
+    case JSONString:
+        parson_free( valueValue->string.charsId );
+        break;
+    case JSONArray:
+        json_array_free(
+            valueValue->arrayId
+            , valueValue->array
+        );
+        break;
+    default:
+        break;
     }
 
     parson_free( valueId );

@@ -14,7 +14,7 @@ CFLAGS += -std=gnu11 -Os -G0 -Wall -fno-builtin-printf -Iinc
 CXXFLAGS = $(CFLAGS) -fno-exceptions -fno-rtti
 ASFLAGS = $(CFLAGS)
 LDFLAGS = 
-LIBS = -lpspusb_driver
+LIBS = -lc -lpspuser -lpspusb_driver
 
 PSPSDK=$(shell psp-config --pspsdk-path)
 include $(PSPSDK)/lib/build_prx.mak
