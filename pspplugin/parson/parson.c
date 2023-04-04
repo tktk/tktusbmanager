@@ -194,9 +194,7 @@ static JSON_Status   verify_utf8_sequence(const unsigned char *string, int *len)
 static parson_bool_t is_valid_utf8(const char *string, size_t string_len);
 */
 static parson_bool_t is_decimal(const char *string, size_t length);
-/*
 static unsigned long hash_string(const char *string, size_t n);
-*/
 
 // JSON Object
 static JSON_Object * json_object_make(
@@ -212,10 +210,16 @@ static void json_object_deinit(
     , parson_bool_t free_keys
     , parson_bool_t free_values
 );
-/*
 static JSON_Status   json_object_grow_and_rehash(JSON_Object *object);
 static size_t        json_object_get_cell_ix(const JSON_Object *object, const char *key, size_t key_len, unsigned long hash, parson_bool_t *out_found);
-static JSON_Status   json_object_add(JSON_Object *object, char *name, JSON_Value *value);
+static JSON_Status json_object_add(
+    JSON_Object *   object
+    , SceUID        nameId
+    , char *        name
+    , SceUID        valueId
+    , JSON_Value *  value
+);
+/*
 static JSON_Value  * json_object_getn_value(const JSON_Object *object, const char *name, size_t name_len);
 static JSON_Status   json_object_remove_internal(JSON_Object *object, const char *name, parson_bool_t free_value);
 static JSON_Status   json_object_dotremove_internal(JSON_Object *object, const char *name, parson_bool_t free_value);
@@ -521,7 +525,6 @@ static parson_bool_t is_decimal(const char *string, size_t length) {
     return PARSON_TRUE;
 }
 
-/*
 static unsigned long hash_string(const char *string, size_t n) {
 #ifdef PARSON_FORCE_HASH_COLLISIONS
     (void)string;
@@ -541,7 +544,6 @@ static unsigned long hash_string(const char *string, size_t n) {
     return hash;
 #endif
 }
-*/
 
 // JSON Object
 static JSON_Object * json_object_make(
@@ -716,33 +718,50 @@ static void json_object_deinit(
     object->hashesId = 0;
 }
 
-/*
-static JSON_Status json_object_grow_and_rehash(JSON_Object *object) {
-    JSON_Value *wrapping_value = NULL;
+static JSON_Status json_object_grow_and_rehash(
+    JSON_Object *   object
+)
+{
+    const size_t    NEW_CAPACITY = MAX(
+        object->cell_capacity * 2
+        , STARTING_CAPACITY
+    );
+
     JSON_Object new_object;
-    char *key = NULL;
-    JSON_Value *value = NULL;
-    unsigned int i = 0;
-    size_t new_capacity = MAX(object->cell_capacity * 2, STARTING_CAPACITY);
-    JSON_Status res = json_object_init(&new_object, new_capacity);
-    if (res != JSONSuccess) {
+    if( json_object_init(
+        &new_object
+        , NEW_CAPACITY
+    ) != JSONSuccess ) {
         return JSONFailure;
     }
 
-    wrapping_value = json_object_get_wrapping_value(object);
+    JSON_Value *    wrapping_value = json_object_get_wrapping_value( object );
     new_object.wrapping_value = wrapping_value;
 
-    for (i = 0; i < object->count; i++) {
-        key = object->names[i];
-        value = object->values[i];
-        res = json_object_add(&new_object, key, value);
-        if (res != JSONSuccess) {
-            json_object_deinit(&new_object, PARSON_FALSE, PARSON_FALSE);
+    unsigned int    i;
+    for( i = 0 ; i < object->count ; i++ ) {
+        JSON_Value *    value = object->values[ i ];
+        if( json_object_add(
+            &new_object
+            , object->nameIds[ i ]
+            , object->names[ i ]
+            , object->valueIds[ i ]
+            , value
+        ) != JSONSuccess ) {
+            json_object_deinit(
+                &new_object
+                , PARSON_FALSE
+                , PARSON_FALSE
+            );
             return JSONFailure;
         }
         value->parent = wrapping_value;
     }
-    json_object_deinit(object, PARSON_FALSE, PARSON_FALSE);
+    json_object_deinit(
+        object
+        , PARSON_FALSE
+        , PARSON_FALSE
+    );
     *object = new_object;
     return JSONSuccess;
 }
@@ -778,42 +797,64 @@ static size_t json_object_get_cell_ix(const JSON_Object *object, const char *key
     return OBJECT_INVALID_IX;
 }
 
-static JSON_Status json_object_add(JSON_Object *object, char *name, JSON_Value *value) {
-    unsigned long hash = 0;
-    parson_bool_t found = PARSON_FALSE;
-    size_t cell_ix = 0;
-    JSON_Status res = JSONFailure;
-
-    if (!object || !name || !value) {
+static JSON_Status json_object_add(
+    JSON_Object *   object
+    , SceUID        nameId
+    , char *        name
+    , SceUID        valueId
+    , JSON_Value *  value
+)
+{
+    if( !object || !name || !value ) {
         return JSONFailure;
     }
 
-    hash = hash_string(name, strlen(name));
-    found = PARSON_FALSE;
-    cell_ix = json_object_get_cell_ix(object, name, strlen(name), hash, &found);
-    if (found) {
+    const size_t    NAME_LENGTH = strlen( name );
+
+    unsigned long   hash = hash_string(
+        name
+        , NAME_LENGTH
+    );
+    parson_bool_t   found = PARSON_FALSE;
+
+    size_t  cell_ix = json_object_get_cell_ix(
+        object
+        , name
+        , NAME_LENGTH
+        , hash
+        , &found
+    );
+    if( found ) {
         return JSONFailure;
     }
 
-    if (object->count >= object->item_capacity) {
-        res = json_object_grow_and_rehash(object);
-        if (res != JSONSuccess) {
+    if( object->count >= object->item_capacity ) {
+        if( json_object_grow_and_rehash( object ) != JSONSuccess ) {
             return JSONFailure;
         }
-        cell_ix = json_object_get_cell_ix(object, name, strlen(name), hash, &found);
+        cell_ix = json_object_get_cell_ix(
+            object
+            , name
+            , NAME_LENGTH
+            , hash
+            , &found
+        );
     }
 
-    object->names[object->count] = name;
-    object->cells[cell_ix] = object->count;
-    object->values[object->count] = value;
-    object->cell_ixs[object->count] = cell_ix;
-    object->hashes[object->count] = hash;
+    object->nameIds[ object->count ] = nameId;
+    object->names[ object->count ] = name;
+    object->cells[ cell_ix ] = object->count;
+    object->valueIds[ object->count ] = valueId;
+    object->values[ object->count ] = value;
+    object->cell_ixs[ object->count ] = cell_ix;
+    object->hashes[ object->count ] = hash;
     object->count++;
-    value->parent = json_object_get_wrapping_value(object);
+    value->parent = json_object_get_wrapping_value( object );
 
     return JSONSuccess;
 }
 
+/*
 static JSON_Value * json_object_getn_value(const JSON_Object *object, const char *name, size_t name_len) {
     unsigned long hash = 0;
     parson_bool_t found = PARSON_FALSE;
@@ -1932,6 +1973,7 @@ JSON_Value * json_object_get_value_at(const JSON_Object *object, size_t index) {
     }
     return object->values[index];
 }
+*/
 
 JSON_Value *json_object_get_wrapping_value(const JSON_Object *object) {
     if (!object) {
@@ -1940,6 +1982,7 @@ JSON_Value *json_object_get_wrapping_value(const JSON_Object *object) {
     return object->wrapping_value;
 }
 
+/*
 int json_object_has_value (const JSON_Object *object, const char *name) {
     return json_object_get_value(object, name) != NULL;
 }
@@ -2009,11 +2052,9 @@ JSON_Value_Type json_value_get_type(const JSON_Value *value) {
     return value ? value->type : JSONError;
 }
 
-/*
 JSON_Object * json_value_get_object(const JSON_Value *value) {
     return json_value_get_type(value) == JSONObject ? value->value.object : NULL;
 }
-*/
 
 JSON_Array * json_value_get_array(const JSON_Value *value) {
     return json_value_get_type(value) == JSONArray ? value->value.array : NULL;
