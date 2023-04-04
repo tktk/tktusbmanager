@@ -192,7 +192,9 @@ static JSON_Status parse_utf16_hex(const char *string, unsigned int *result);
 static int         num_bytes_in_utf8_sequence(unsigned char c);
 static JSON_Status   verify_utf8_sequence(const unsigned char *string, int *len);
 static parson_bool_t is_valid_utf8(const char *string, size_t string_len);
+*/
 static parson_bool_t is_decimal(const char *string, size_t length);
+/*
 static unsigned long hash_string(const char *string, size_t n);
 */
 
@@ -246,8 +248,11 @@ static JSON_Value *  parse_object_value(const char **string, size_t nesting);
 static JSON_Value *  parse_array_value(const char **string, size_t nesting);
 static JSON_Value *  parse_string_value(const char **string);
 static JSON_Value *  parse_boolean_value(const char **string);
-static JSON_Value *  parse_number_value(const char **string);
 */
+static JSON_Value * parse_number_value(
+    SceUID *        valueIdPtr
+    , const char ** string
+);
 static JSON_Value *  parse_null_value(
     SceUID *        valueIdPtr
     , const char ** string
@@ -467,6 +472,7 @@ static int is_valid_utf8(const char *string, size_t string_len) {
     }
     return PARSON_TRUE;
 }
+*/
 
 static parson_bool_t is_decimal(const char *string, size_t length) {
     if (length > 1 && string[0] == '0' && string[1] != '.') {
@@ -483,6 +489,7 @@ static parson_bool_t is_decimal(const char *string, size_t length) {
     return PARSON_TRUE;
 }
 
+/*
 static unsigned long hash_string(const char *string, size_t n) {
 #ifdef PARSON_FORCE_HASH_COLLISIONS
     (void)string;
@@ -1222,22 +1229,36 @@ static JSON_Value * parse_boolean_value(const char **string) {
     }
     return NULL;
 }
+*/
 
-static JSON_Value * parse_number_value(const char **string) {
-    char *end;
-    double number = 0;
+static JSON_Value * parse_number_value(
+    SceUID *        valueIdPtr
+    , const char ** string
+)
+{
+    char *  end;
+
     errno = 0;
-    number = strtod(*string, &end);
-    if (errno == ERANGE && (number <= -HUGE_VAL || number >= HUGE_VAL)) {
+    double  number = strtod(
+        *string
+        , &end
+    );
+    if( errno == ERANGE && ( number <= -HUGE_VAL || number >= HUGE_VAL ) ) {
         return NULL;
     }
-    if ((errno && errno != ERANGE) || !is_decimal(*string, end - *string)) {
+    if( ( errno && errno != ERANGE ) || !is_decimal(
+        *string
+        , end - *string
+    ) ) {
         return NULL;
     }
     *string = end;
-    return json_value_init_number(number);
+
+    return json_value_init_number(
+        valueIdPtr
+        , number
+    );
 }
-*/
 
 static JSON_Value * parse_null_value(
     SceUID *        valueIdPtr
