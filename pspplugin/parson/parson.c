@@ -83,6 +83,9 @@
 #undef malloc
 #undef free
 
+#undef  isnan
+#undef  isinf
+
 #if defined(isnan) && defined(isinf)
 #define IS_NUMBER_INVALID(x) (isnan((x)) || isinf((x)))
 #else
@@ -1847,22 +1850,31 @@ JSON_Value * json_value_init_string_with_len(const char *string, size_t length) 
     }
     return value;
 }
+*/
 
-JSON_Value * json_value_init_number(double number) {
-    JSON_Value *new_value = NULL;
-    if (IS_NUMBER_INVALID(number)) {
+JSON_Value * json_value_init_number(
+    SceUID *    valueIdPtr
+    , double    number
+) {
+    if( IS_NUMBER_INVALID( number ) ) {
         return NULL;
     }
-    new_value = (JSON_Value*)parson_malloc(sizeof(JSON_Value));
-    if (new_value == NULL) {
+
+    SceUID  valueId = parson_malloc( sizeof( JSON_Value ) );
+
+    JSON_Value *    new_value = ( JSON_Value * )parson_get_addr( valueId );
+    if( new_value == NULL ) {
         return NULL;
     }
+    *valueIdPtr = valueId;
+
     new_value->parent = NULL;
     new_value->type = JSONNumber;
     new_value->value.number = number;
     return new_value;
 }
 
+/*
 JSON_Value * json_value_init_boolean(int boolean) {
     JSON_Value *new_value = (JSON_Value*)parson_malloc(sizeof(JSON_Value));
     if (!new_value) {
@@ -1880,7 +1892,8 @@ JSON_Value * json_value_init_null(
 )
 {
     SceUID  valueId = parson_malloc( sizeof( JSON_Value ) );
-    JSON_Value *new_value = parson_get_addr( valueId );
+
+    JSON_Value *    new_value = ( JSON_Value * )parson_get_addr( valueId );
     if( !new_value ) {
         return NULL;
     }

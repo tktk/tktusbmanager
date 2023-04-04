@@ -252,13 +252,16 @@ JSON_Value * json_value_init_object (void);
 JSON_Value * json_value_init_array  (void);
 JSON_Value * json_value_init_string (const char *string); /* copies passed string */
 JSON_Value * json_value_init_string_with_len(const char *string, size_t length); /* copies passed string, length shouldn't include last null character */
-JSON_Value * json_value_init_number (double number);
+JSON_Value * json_value_init_number(
+    SceUID *    valueIdPtr
+    , double    number
+);
 JSON_Value * json_value_init_boolean(int boolean);
-JSON_Value * json_value_init_null   (
+JSON_Value * json_value_init_null(
     SceUID *    valueIdPtr
 );
 JSON_Value * json_value_deep_copy   (const JSON_Value *value);
-void         json_value_free        (
+void         json_value_free(
     SceUID          valueId
     , JSON_Value *  value
 );
