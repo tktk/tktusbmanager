@@ -226,9 +226,11 @@ static JSON_Array * json_array_make(
     SceUID *        arrayIdPtr
     , JSON_Value *  wrapping_value
 );
-/*
-static JSON_Status  json_array_add(JSON_Array *array, JSON_Value *value);
-*/
+static JSON_Status json_array_add(
+    JSON_Array *    array
+    , SceUID        valueId
+    , JSON_Value *  value
+);
 static JSON_Status json_array_resize(
     JSON_Array *    array
     , size_t        new_capacity
@@ -869,20 +871,30 @@ static JSON_Array * json_array_make(
     return new_array;
 }
 
-/*
-static JSON_Status json_array_add(JSON_Array *array, JSON_Value *value) {
-    if (array->count >= array->capacity) {
-        size_t new_capacity = MAX(array->capacity * 2, STARTING_CAPACITY);
-        if (json_array_resize(array, new_capacity) != JSONSuccess) {
+static JSON_Status json_array_add(
+    JSON_Array *    array
+    , SceUID        valueId
+    , JSON_Value *  value
+)
+{
+    if( array->count >= array->capacity ) {
+        size_t  new_capacity = MAX(
+            array->capacity * 2
+            , STARTING_CAPACITY
+        );
+        if( json_array_resize(
+            array
+            , new_capacity
+        ) != JSONSuccess ) {
             return JSONFailure;
         }
     }
-    value->parent = json_array_get_wrapping_value(array);
-    array->items[array->count] = value;
+    value->parent = json_array_get_wrapping_value( array );
+    array->itemIds[ array->count ] = valueId;
+    array->items[ array->count ] = value;
     array->count++;
     return JSONSuccess;
 }
-*/
 
 static JSON_Status json_array_resize(
     JSON_Array *    array
@@ -1876,6 +1888,7 @@ int json_array_get_boolean(const JSON_Array *array, size_t index) {
 size_t json_array_get_count(const JSON_Array *array) {
     return array ? array->count : 0;
 }
+*/
 
 JSON_Value * json_array_get_wrapping_value(const JSON_Array *array) {
     if (!array) {
@@ -1883,7 +1896,6 @@ JSON_Value * json_array_get_wrapping_value(const JSON_Array *array) {
     }
     return array->wrapping_value;
 }
-*/
 
 // JSON Value API
 JSON_Value_Type json_value_get_type(const JSON_Value *value) {
