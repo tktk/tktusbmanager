@@ -199,9 +199,10 @@ static unsigned long hash_string(const char *string, size_t n);
 */
 
 // JSON Object
-/*
-static JSON_Object * json_object_make(JSON_Value *wrapping_value);
-*/
+static JSON_Object * json_object_make(
+    SceUID *        objectIdPtr
+    , JSON_Value *  wrapping_value
+);
 static JSON_Status json_object_init(
     JSON_Object *   object
     , size_t        capacity
@@ -543,22 +544,28 @@ static unsigned long hash_string(const char *string, size_t n) {
 */
 
 // JSON Object
-/*
-static JSON_Object * json_object_make(JSON_Value *wrapping_value) {
-    JSON_Status res = JSONFailure;
-    JSON_Object *new_obj = (JSON_Object*)parson_malloc(sizeof(JSON_Object));
-    if (new_obj == NULL) {
+static JSON_Object * json_object_make(
+    SceUID *        objectIdPtr
+    , JSON_Value *  wrapping_value
+)
+{
+    SceUID  objectId = parson_malloc( sizeof( JSON_Object ) );
+
+    JSON_Object *   new_object =  ( JSON_Object * )parson_get_addr( objectId );
+    if( new_object == NULL ) {
         return NULL;
     }
-    new_obj->wrapping_value = wrapping_value;
-    res = json_object_init(new_obj, 0);
-    if (res != JSONSuccess) {
-        parson_free(new_obj);
+    if( json_object_init(
+        new_object
+        , 0
+    ) != JSONSuccess ) {
+        parson_free( objectId );
         return NULL;
     }
-    return new_obj;
+
+    new_object->wrapping_value = wrapping_value;
+    return new_object;
 }
-*/
 
 static JSON_Status json_object_init(
     JSON_Object *   object
@@ -929,7 +936,7 @@ static JSON_Array * json_array_make(
     *arrayIdPtr = arrayId;
 
     new_array->wrapping_value = wrapping_value;
-    new_array->items = (JSON_Value**)NULL;
+    new_array->items = ( JSON_Value ** )NULL;
     new_array->capacity = 0;
     new_array->count = 0;
     return new_array;
@@ -2101,7 +2108,7 @@ JSON_Value * json_value_init_array(
     SceUID  arrayId = 0;
 
     JSON_Array *    array = json_array_make(
-        &( arrayId )
+        &arrayId
         , new_value
     );
     if( !array ) {
