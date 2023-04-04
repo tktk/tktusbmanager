@@ -222,8 +222,11 @@ static void          json_object_free(
 );
 
 // JSON Array
+static JSON_Array * json_array_make(
+    SceUID *        arrayIdPtr
+    , JSON_Value *  wrapping_value
+);
 /*
-static JSON_Array * json_array_make(JSON_Value *wrapping_value);
 static JSON_Status  json_array_add(JSON_Array *array, JSON_Value *value);
 static JSON_Status  json_array_resize(JSON_Array *array, size_t new_capacity);
 */
@@ -843,12 +846,19 @@ static void json_object_free(
 }
 
 // JSON Array
-/*
-static JSON_Array * json_array_make(JSON_Value *wrapping_value) {
-    JSON_Array *new_array = (JSON_Array*)parson_malloc(sizeof(JSON_Array));
-    if (new_array == NULL) {
+static JSON_Array * json_array_make(
+    SceUID *        arrayIdPtr
+    , JSON_Value *  wrapping_value
+)
+{
+    SceUID  arrayId = parson_malloc( sizeof( JSON_Array ) );
+
+    JSON_Array *    new_array = ( JSON_Array * )parson_get_addr( arrayId );
+    if( new_array == NULL ) {
         return NULL;
     }
+    *arrayIdPtr = arrayId;
+
     new_array->wrapping_value = wrapping_value;
     new_array->items = (JSON_Value**)NULL;
     new_array->capacity = 0;
@@ -856,6 +866,7 @@ static JSON_Array * json_array_make(JSON_Value *wrapping_value) {
     return new_array;
 }
 
+/*
 static JSON_Status json_array_add(JSON_Array *array, JSON_Value *value) {
     if (array->count >= array->capacity) {
         size_t new_capacity = MAX(array->capacity * 2, STARTING_CAPACITY);
