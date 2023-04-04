@@ -1219,21 +1219,44 @@ static JSON_Value * parse_string_value(const char **string) {
     }
     return value;
 }
+*/
 
-//TODO
-static JSON_Value * parse_boolean_value(const char **string) {
-    size_t true_token_size = SIZEOF_TOKEN("true");
-    size_t false_token_size = SIZEOF_TOKEN("false");
-    if (strncmp("true", *string, true_token_size) == 0) {
-        *string += true_token_size;
-        return json_value_init_boolean(1);
-    } else if (strncmp("false", *string, false_token_size) == 0) {
-        *string += false_token_size;
-        return json_value_init_boolean(0);
+#define TRUE_TOKEN "true"
+#define FALSE_TOKEN "false"
+
+enum {
+    TRUE_TOKEN_SIZE = SIZEOF_TOKEN( TRUE_TOKEN ),
+    FALSE_TOKEN_SIZE = SIZEOF_TOKEN( FALSE_TOKEN ),
+};
+
+static JSON_Value * parse_boolean_value(
+    SceUID *        valueIdPtr
+    , const char ** string
+)
+{
+    if( strncmp(
+        TRUE_TOKEN
+        , *string
+        , TRUE_TOKEN_SIZE
+    ) == 0 ) {
+        *string += TRUE_TOKEN_SIZE;
+        return json_value_init_boolean(
+            valueIdPtr
+            , 1
+        );
+    } else if( strncmp(
+        FALSE_TOKEN
+        , *string
+        , FALSE_TOKEN_SIZE
+    ) == 0 ) {
+        *string += FALSE_TOKEN_SIZE;
+        return json_value_init_boolean(
+            valueIdPtr
+            , 0
+        );
     }
     return NULL;
 }
-*/
 
 static JSON_Value * parse_number_value(
     SceUID *        valueIdPtr
@@ -1249,8 +1272,7 @@ static JSON_Value * parse_number_value(
     );
     if( errno == ERANGE && ( number <= -HUGE_VAL || number >= HUGE_VAL ) ) {
         return NULL;
-    }
-    if( ( errno && errno != ERANGE ) || !is_decimal(
+    } else if( ( errno && errno != ERANGE ) || !is_decimal(
         *string
         , end - *string
     ) ) {
