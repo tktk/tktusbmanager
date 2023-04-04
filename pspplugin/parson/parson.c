@@ -273,10 +273,16 @@ static char * get_quoted_string(
     , size_t *      output_string_len
     , const char ** string
 );
-/*
-static JSON_Value *  parse_object_value(const char **string, size_t nesting);
-static JSON_Value *  parse_array_value(const char **string, size_t nesting);
-*/
+static JSON_Value * parse_object_value(
+    SceUID *        valueIdPtr
+    , const char ** string
+    , size_t        nesting
+);
+static JSON_Value * parse_array_value(
+    SceUID *        valueIdPtr
+    , const char ** string
+    , size_t        nesting
+);
 static JSON_Value * parse_string_value(
     SceUID *        valueIdPtr
     , const char ** string
@@ -1301,81 +1307,122 @@ static JSON_Value * parse_value(
 */
 }
 
-/*
-//TODO
-static JSON_Value * parse_object_value(const char **string, size_t nesting) {
-    JSON_Status status = JSONFailure;
-    JSON_Value *output_value = NULL, *new_value = NULL;
-    JSON_Object *output_object = NULL;
-    char *new_key = NULL;
+static JSON_Value * parse_object_value(
+    SceUID *        valueIdPtr
+    , const char ** string
+    , size_t        nesting
+)
+{
+    SceUID  valueId = 0;
 
-    output_value = json_value_init_object();
-    if (output_value == NULL) {
+    JSON_Value *    output_value = json_value_init_object( &valueId );
+    if( output_value == NULL ) {
         return NULL;
     }
-    if (**string != '{') {
-        json_value_free(output_value);
+    if( **string != '{') {
+        json_value_free(
+            valueId
+            , output_value
+        );
         return NULL;
     }
-    output_object = json_value_get_object(output_value);
-    SKIP_CHAR(string);
-    SKIP_WHITESPACES(string);
-    if (**string == '}') { // empty object
-        SKIP_CHAR(string);
+    JSON_Object *   output_object = json_value_get_object( output_value );
+    SKIP_CHAR( string );
+    SKIP_WHITESPACES( string );
+    if( **string == '}' ) { // empty object
+        SKIP_CHAR( string );
         return output_value;
     }
-    while (**string != '\0') {
-        size_t key_len = 0;
-        new_key = get_quoted_string(string, &key_len);
+    while( **string != '\0' ) {
+        SceUID  new_keyId = 0;
+
+        size_t  key_len = 0;
+        char *  new_key = get_quoted_string(
+            &new_keyId
+            , &key_len
+            , string
+        );
         // We do not support key names with embedded \0 chars
-        if (!new_key) {
-            json_value_free(output_value);
+        if( !new_key ) {
+            json_value_free(
+                valueId
+                , output_value
+            );
             return NULL;
         }
-        if (key_len != strlen(new_key)) {
-            parson_free(new_key);
-            json_value_free(output_value);
+        if( key_len != strlen( new_key ) ) {
+            parson_free( new_keyId );
+            json_value_free(
+                valueId
+                , output_value
+            );
             return NULL;
         }
-        SKIP_WHITESPACES(string);
-        if (**string != ':') {
-            parson_free(new_key);
-            json_value_free(output_value);
+        SKIP_WHITESPACES( string );
+        if( **string != ':' ) {
+            parson_free( new_keyId );
+            json_value_free(
+                valueId
+                , output_value
+            );
             return NULL;
         }
-        SKIP_CHAR(string);
-        new_value = parse_value(string, nesting);
-        if (new_value == NULL) {
-            parson_free(new_key);
-            json_value_free(output_value);
+        SKIP_CHAR( string );
+
+        SceUID  new_valueId = 0;
+
+        JSON_Value *    new_value = parse_value(
+            &new_valueId
+            , string
+            , nesting
+        );
+        if( new_value == NULL ) {
+            parson_free( new_keyId );
+            json_value_free(
+                valueId
+                , output_value
+            );
             return NULL;
         }
-        status = json_object_add(output_object, new_key, new_value);
-        if (status != JSONSuccess) {
-            parson_free(new_key);
-            json_value_free(new_value);
-            json_value_free(output_value);
+        if( json_object_add(
+            output_object
+            , new_keyId
+            , new_key
+            , new_valueId
+            , new_value
+        ) != JSONSuccess ) {
+            parson_free( new_keyId );
+            json_value_free(
+                new_valueId
+                , new_value
+            );
+            json_value_free(
+                valueId
+                , output_value
+            );
             return NULL;
         }
-        SKIP_WHITESPACES(string);
-        if (**string != ',') {
+        SKIP_WHITESPACES( string );
+        if( **string != ',' ) {
             break;
         }
-        SKIP_CHAR(string);
-        SKIP_WHITESPACES(string);
-        if (**string == '}') {
+        SKIP_CHAR( string );
+        SKIP_WHITESPACES( string );
+        if( **string == '}' ) {
             break;
         }
     }
-    SKIP_WHITESPACES(string);
-    if (**string != '}') {
-        json_value_free(output_value);
+    SKIP_WHITESPACES( string );
+    if( **string != '}' ) {
+        json_value_free(
+            valueId
+            , output_value
+        );
         return NULL;
     }
-    SKIP_CHAR(string);
+    SKIP_CHAR( string );
     return output_value;
 }
-*/
 
 static JSON_Value * parse_array_value(
     SceUID *        valueIdPtr
