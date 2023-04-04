@@ -1263,57 +1263,93 @@ static JSON_Value * parse_object_value(const char **string, size_t nesting) {
     SKIP_CHAR(string);
     return output_value;
 }
+*/
 
-//TODO
-static JSON_Value * parse_array_value(const char **string, size_t nesting) {
-    JSON_Value *output_value = NULL, *new_array_value = NULL;
-    JSON_Array *output_array = NULL;
-    output_value = json_value_init_array();
-    if (output_value == NULL) {
+static JSON_Value * parse_array_value(
+    SceUID *        valueIdPtr
+    , const char ** string
+    , size_t        nesting
+)
+{
+    SceUID  valueId = 0;
+
+    JSON_Value *    output_value = json_value_init_array( &valueId );
+    if( output_value == NULL ) {
         return NULL;
     }
-    if (**string != '[') {
-        json_value_free(output_value);
+
+    if( **string != '[' ) {
+        json_value_free(
+            valueId
+            , output_value
+        );
         return NULL;
     }
-    output_array = json_value_get_array(output_value);
-    SKIP_CHAR(string);
-    SKIP_WHITESPACES(string);
-    if (**string == ']') { // empty array
-        SKIP_CHAR(string);
+    JSON_Array *    output_array = json_value_get_array( output_value );
+    SKIP_CHAR( string );
+    SKIP_WHITESPACES( string );
+    if( **string == ']' ) { // empty array
+        SKIP_CHAR( string );
         return output_value;
     }
-    while (**string != '\0') {
-        new_array_value = parse_value(string, nesting);
-        if (new_array_value == NULL) {
-            json_value_free(output_value);
+    while( **string != '\0' ) {
+        SceUID  new_array_valueId = 0;
+
+        JSON_Value *    new_array_value = parse_value(
+            &new_array_valueId
+            , string
+            , nesting
+        );
+        if( new_array_value == NULL ) {
+            json_value_free(
+                valueId
+                , output_value
+            );
             return NULL;
         }
-        if (json_array_add(output_array, new_array_value) != JSONSuccess) {
-            json_value_free(new_array_value);
-            json_value_free(output_value);
+        if( json_array_add(
+            output_array
+            , new_array_valueId
+            , new_array_value
+        ) != JSONSuccess ) {
+            json_value_free(
+                new_array_valueId
+                , new_array_value
+            );
+            json_value_free(
+                valueId
+                , output_value
+            );
             return NULL;
         }
-        SKIP_WHITESPACES(string);
-        if (**string != ',') {
+        SKIP_WHITESPACES( string );
+        if( **string != ',' ) {
             break;
         }
-        SKIP_CHAR(string);
-        SKIP_WHITESPACES(string);
-        if (**string == ']') {
+        SKIP_CHAR( string );
+        SKIP_WHITESPACES( string );
+        if( **string == ']' ) {
             break;
         }
     }
-    SKIP_WHITESPACES(string);
+    SKIP_WHITESPACES( string );
     if (**string != ']' || // Trim array after parsing is over
-        json_array_resize(output_array, json_array_get_count(output_array)) != JSONSuccess) {
-            json_value_free(output_value);
-            return NULL;
+        json_array_resize(
+            output_array
+            , json_array_get_count( output_array )
+        ) != JSONSuccess
+    ) {
+        json_value_free(
+            valueId
+            , output_value
+        );
+        return NULL;
     }
-    SKIP_CHAR(string);
+    SKIP_CHAR( string );
+
+    *valueIdPtr = valueId;
     return output_value;
 }
-*/
 
 static JSON_Value * parse_string_value(
     SceUID *        valueIdPtr
@@ -1884,11 +1920,11 @@ JSON_Array * json_array_get_array(const JSON_Array *array, size_t index) {
 int json_array_get_boolean(const JSON_Array *array, size_t index) {
     return json_value_get_boolean(json_array_get_value(array, index));
 }
+*/
 
 size_t json_array_get_count(const JSON_Array *array) {
     return array ? array->count : 0;
 }
-*/
 
 JSON_Value * json_array_get_wrapping_value(const JSON_Array *array) {
     if (!array) {
