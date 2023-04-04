@@ -233,14 +233,19 @@ static void json_array_free(
 );
 
 // JSON Value
+static JSON_Value * json_value_init_string_no_copy(
+    SceUID *    valueIdPtr
+    , SceUID    stringId
+    , char *    string
+    , size_t    length
+);
 /*
-static JSON_Value * json_value_init_string_no_copy(char *string, size_t length);
 static const JSON_String * json_value_get_string_desc(const JSON_Value *value);
 */
 
 // Parser
-/*
 static JSON_Status   skip_quotes(const char **string);
+/*
 static JSON_Status   parse_utf16(const char **unprocessed, char **processed);
 static char *        process_string(const char *input, size_t input_len, size_t *output_len);
 static char *        get_quoted_string(const char **string, size_t *output_string_len);
@@ -887,22 +892,33 @@ static void json_array_free(
 }
 
 // JSON Value
-/*
-static JSON_Value * json_value_init_string_no_copy(char *string, size_t length) {
-    JSON_Value *new_value = (JSON_Value*)parson_malloc(sizeof(JSON_Value));
-    if (!new_value) {
+static JSON_Value * json_value_init_string_no_copy(
+    SceUID *    valueIdPtr
+    , SceUID    stringId
+    , char *    string
+    , size_t    length
+)
+{
+    SceUID  valueId = parson_malloc( sizeof( JSON_Value ) );
+
+    JSON_Value *    new_value = ( JSON_Value * )parson_get_addr( valueId );
+    if( !new_value ) {
         return NULL;
     }
+    *valueIdPtr = valueId;
+
+    JSON_String *   new_string = &( new_value->value.string );
+
     new_value->parent = NULL;
     new_value->type = JSONString;
-    new_value->value.string.chars = string;
-    new_value->value.string.length = length;
+    new_string->charsId = stringId;
+    new_string->chars = string;
+    new_string->length = length;
+
     return new_value;
 }
-*/
 
 // Parser
-/*
 static JSON_Status skip_quotes(const char **string) {
     if (**string != '\"') {
         return JSONFailure;
@@ -923,6 +939,7 @@ static JSON_Status skip_quotes(const char **string) {
     return JSONSuccess;
 }
 
+/*
 static JSON_Status parse_utf16(const char **unprocessed, char **processed) {
     unsigned int cp, lead, trail;
     char *processed_ptr = *processed;
