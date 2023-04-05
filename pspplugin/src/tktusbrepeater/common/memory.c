@@ -5,7 +5,7 @@
 #define PARTITION_NAME "tktusbrepeater"
 
 enum {
-    USER_PARTITION = 2,
+    PARTITION_TYPE_USER = 2,
 };
 
 SceUID allocMemory(
@@ -13,7 +13,7 @@ SceUID allocMemory(
 )
 {
     return sceKernelAllocPartitionMemory(
-        USER_PARTITION
+        PARTITION_TYPE_USER
         , PARTITION_NAME
         , PSP_SMEM_Low
         , _SIZE
