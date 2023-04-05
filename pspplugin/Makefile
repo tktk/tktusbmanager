@@ -4,6 +4,7 @@ OBJS += \
     src/tktusbrepeater/main.o \
     src/tktusbrepeater/config/config.o \
     src/tktusbrepeater/common/parson.o \
+    src/tktusbrepeater/common/file.o \
     src/tktusbrepeater/common/memory.o \
     parson/parson.o \
 
