@@ -29,9 +29,8 @@ void freeMemory(
 }
 
 void * getMemoryAddress(
-    SceUID  _id
+    SceUID  _ID
 )
 {
-    //TODO
-    return NULL;
+    return sceKernelGetBlockHeadAddr( _ID );
 }
