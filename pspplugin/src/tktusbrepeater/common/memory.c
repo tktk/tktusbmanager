@@ -22,10 +22,10 @@ SceUID allocMemory(
 }
 
 void freeMemory(
-    SceUID  _id
+    SceUID  _ID
 )
 {
-    //TODO
+    sceKernelFreePartitionMemory( _ID );
 }
 
 void * getMemoryAddress(
