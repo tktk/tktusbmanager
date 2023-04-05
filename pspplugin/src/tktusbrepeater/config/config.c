@@ -1,4 +1,4 @@
-#include "tktusbrepeater/config.h"
+#include "tktusbrepeater/config/config.h"
 #include "parson/parson.h"
 #include <pspiofilemgr.h>
 #include <pspsysmem.h>

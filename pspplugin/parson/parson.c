@@ -679,7 +679,7 @@ static void json_object_deinit(
     , parson_bool_t free_values
 )
 {
-    unsigned int i = 0;
+    unsigned int i;
     for( i = 0 ; i < object->count ; i++ ) {
         if( free_keys ) {
             parson_free( object->nameIds[ i ] );

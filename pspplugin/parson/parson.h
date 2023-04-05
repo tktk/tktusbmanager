@@ -66,7 +66,7 @@ enum json_result_t {
 typedef int JSON_Status;
 
 typedef SceUID ( *JSON_Malloc_Function )( SceSize );
-typedef int    ( *JSON_Free_Function )( SceUID );
+typedef void   ( *JSON_Free_Function )( SceUID );
 typedef void * ( *JSON_GetAddr_Function )( SceUID );
 
 /* A function used for serializing numbers (see json_set_number_serialization_function).
