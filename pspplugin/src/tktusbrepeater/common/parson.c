@@ -1,4 +1,4 @@
-#include "tktusbrepeater/parson.h"
+#include "tktusbrepeater/common/parson.h"
 #include "parson/parson.h"
 #include <pspsysmem.h>
 #include <pspkerneltypes.h>

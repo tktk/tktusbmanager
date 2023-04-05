@@ -1,7 +1,0 @@
-#ifndef TKTUSBREPEATER_PARSON_H
-#define TKTUSBREPEATER_PARSON_H
-
-void initializeParson(
-);
-
-#endif  // TKTUSBREPEATER_PARSON_H

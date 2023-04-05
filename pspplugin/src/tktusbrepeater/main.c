@@ -1,5 +1,5 @@
 #include "tktusbrepeater/config/config.h"
-#include "tktusbrepeater/parson.h"
+#include "tktusbrepeater/common/parson.h"
 #include <pspkernel.h>
 #include <pspusb.h>
 
