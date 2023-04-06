@@ -195,5 +195,9 @@ void unloadConfig(
     TktUsbRepeaterConfig *  _config
 )
 {
-    //TODO エンドポイント情報解放
+    freeEndpoints(
+        _config->endpointsId
+        , _config->endpointsCount
+        , _config->endpoints
+    );
 }
