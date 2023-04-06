@@ -857,7 +857,6 @@ static JSON_Status json_object_add(
     return JSONSuccess;
 }
 
-/*
 static JSON_Value * json_object_getn_value(const JSON_Object *object, const char *name, size_t name_len) {
     unsigned long hash = 0;
     parson_bool_t found = PARSON_FALSE;
@@ -876,6 +875,7 @@ static JSON_Value * json_object_getn_value(const JSON_Object *object, const char
     return object->values[item_ix];
 }
 
+/*
 static JSON_Status json_object_remove_internal(JSON_Object *object, const char *name, parson_bool_t free_value) {
     unsigned long hash = 0;
     parson_bool_t found = PARSON_FALSE;
@@ -1951,7 +1951,6 @@ JSON_Value * json_parse_string_with_comments(
 
 // JSON Object API
 
-/*
 JSON_Value * json_object_get_value(const JSON_Object *object, const char *name) {
     if (object == NULL || name == NULL) {
         return NULL;
@@ -1959,6 +1958,7 @@ JSON_Value * json_object_get_value(const JSON_Object *object, const char *name) 
     return json_object_getn_value(object, name, strlen(name));
 }
 
+/*
 const char * json_object_get_string(const JSON_Object *object, const char *name) {
     return json_value_get_string(json_object_get_value(object, name));
 }
@@ -1970,11 +1970,13 @@ size_t json_object_get_string_len(const JSON_Object *object, const char *name) {
 double json_object_get_number(const JSON_Object *object, const char *name) {
     return json_value_get_number(json_object_get_value(object, name));
 }
+*/
 
 JSON_Object * json_object_get_object(const JSON_Object *object, const char *name) {
     return json_value_get_object(json_object_get_value(object, name));
 }
 
+/*
 JSON_Array * json_object_get_array(const JSON_Object *object, const char *name) {
     return json_value_get_array(json_object_get_value(object, name));
 }
@@ -2015,6 +2017,7 @@ JSON_Array * json_object_dotget_array(const JSON_Object *object, const char *nam
 int json_object_dotget_boolean(const JSON_Object *object, const char *name) {
     return json_value_get_boolean(json_object_dotget_value(object, name));
 }
+*/
 
 size_t json_object_get_count(const JSON_Object *object) {
     return object ? object->count : 0;
@@ -2033,7 +2036,6 @@ JSON_Value * json_object_get_value_at(const JSON_Object *object, size_t index) {
     }
     return object->values[index];
 }
-*/
 
 JSON_Value *json_object_get_wrapping_value(const JSON_Object *object) {
     if (!object) {
@@ -2134,11 +2136,13 @@ size_t json_value_get_string_len(const JSON_Value *value) {
     const JSON_String *str = json_value_get_string_desc(value);
     return str ? str->length : 0;
 }
+*/
 
 double json_value_get_number(const JSON_Value *value) {
     return json_value_get_type(value) == JSONNumber ? value->value.number : 0;
 }
 
+/*
 int json_value_get_boolean(const JSON_Value *value) {
     return json_value_get_type(value) == JSONBoolean ? value->value.boolean : -1;
 }
