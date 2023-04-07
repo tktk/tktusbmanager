@@ -85,7 +85,7 @@ static int readFileLoop(
     while( 1 ) {
         const int   READ_SIZE = sceIoRead(
             _FILE_ID
-            , ( *_contentsPtr ) + ( contentsSize - BUFFER_SIZE )
+            , contents + ( contentsSize - BUFFER_SIZE )
             , BUFFER_SIZE
         );
         if( READ_SIZE < BUFFER_SIZE ) {
