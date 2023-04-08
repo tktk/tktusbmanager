@@ -49,5 +49,9 @@ void stopTktUsbDriver(
     TktUsbDriver *  _driver
 )
 {
-    //TODO
+    sceUsbStop(
+        _driver->usbDriver.name
+        , 0
+        , NULL
+    );
 }
