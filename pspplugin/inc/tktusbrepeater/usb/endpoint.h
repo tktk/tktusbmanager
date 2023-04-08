@@ -16,14 +16,14 @@ typedef struct
     struct UsbEndpoint *    usbEndpoint;
 } TktUsbEndpoint;
 
-int allocEndpoint(
+int allocTktUsbEndpoint(
     TktUsbEndpoint *
     , size_t
     , const char *
     , char
 );
 
-void freeEndpoint(
+void freeTktUsbEndpoint(
     TktUsbEndpoint *
 );
 

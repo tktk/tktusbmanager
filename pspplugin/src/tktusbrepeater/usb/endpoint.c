@@ -4,7 +4,7 @@
 #include <string.h>
 #include <stddef.h>
 
-int allocEndpoint(
+int allocTktUsbEndpoint(
     TktUsbEndpoint *    _endpoint
     , size_t            _NAME_SIZE
     , const char *      _NAME
@@ -32,7 +32,7 @@ int allocEndpoint(
     return 0;
 }
 
-void freeEndpoint(
+void freeTktUsbEndpoint(
     TktUsbEndpoint *    _endpoint
 )
 {

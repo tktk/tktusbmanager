@@ -46,7 +46,7 @@ static int initializeEndpoints(
     for( i = 0 ; i < ENDPOINTS_COUNT ; i++ ) {
         const TktUsbRepeaterConfigEndpoint *    ENDPOINT_CONFIG = _CONFIG->endpoints + i;
 
-        result = allocEndpoint(
+        result = allocTktUsbEndpoint(
             endpoints.endpoints + i
             , ENDPOINT_CONFIG->nameSize
             , ENDPOINT_CONFIG->name

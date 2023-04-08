@@ -38,7 +38,7 @@ void freeTktUsbEndpoints(
     for( i = 0 ; i < _endpoints->endpointsCount ; i++ ) {
         TktUsbEndpoint *    endpoint = _endpoints->endpoints + i;
 
-        freeEndpoint( endpoint );
+        freeTktUsbEndpoint( endpoint );
     }
 
     _endpoints->endpointsCount = 0;
