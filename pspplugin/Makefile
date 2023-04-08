@@ -2,6 +2,8 @@ TARGET = tktusbrepeater
 
 OBJS += \
     src/tktusbrepeater/main.o \
+    src/tktusbrepeater/usb/endpoints.o \
+    src/tktusbrepeater/usb/endpoint.o \
     src/tktusbrepeater/config/config.o \
     src/tktusbrepeater/common/parson.o \
     src/tktusbrepeater/common/file.o \
