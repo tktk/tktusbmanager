@@ -15,7 +15,11 @@ int startUsbBus(
 void stopUsbBus(
 )
 {
-    //TODO
+    sceUsbStop(
+        PSP_USBBUS_DRIVERNAME
+        , 0
+        , 0
+    );
 }
 
 int activateUsb(
