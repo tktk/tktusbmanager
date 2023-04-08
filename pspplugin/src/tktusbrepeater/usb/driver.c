@@ -1,5 +1,7 @@
 #include "tktusbrepeater/usb/driver.h"
 #include "tktusbrepeater/usb/endpoints.h"
+#include <pspusbbus.h>
+#include <pspusb.h>
 
 int allocTktUsbDriver(
     TktUsbDriver *              _driver
@@ -36,8 +38,11 @@ int startTktUsbDriver(
     TktUsbDriver *  _driver
 )
 {
-    //TODO
-    return 0;
+    return sceUsbStart(
+        _driver->usbDriver.name
+        , 0
+        , NULL
+    );
 }
 
 void stopTktUsbDriver(
