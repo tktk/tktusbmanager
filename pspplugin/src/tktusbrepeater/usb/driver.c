@@ -29,7 +29,7 @@ void unregisterTktUsbDriver(
     TktUsbDriver *  _driver
 )
 {
-    //TODO
+    sceUsbbdUnregister( &( _driver->usbDriver ) );
 }
 
 int startTktUsbDriver(
