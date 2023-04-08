@@ -1,10 +1,15 @@
 #include "tktusbrepeater/usb/usb.h"
+#include <psptypes.h>
+#include <pspusb.h>
 
 int startUsbBus(
 )
 {
-    //TODO
-    return 0;
+    return sceUsbStart(
+        PSP_USBBUS_DRIVERNAME
+        , 0
+        , 0
+    );
 }
 
 void stopUsbBus(
