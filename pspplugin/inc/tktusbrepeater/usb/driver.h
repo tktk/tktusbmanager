@@ -25,7 +25,15 @@ int registerTktUsbDriver(
     TktUsbDriver *
 );
 
+void unregisterTktUsbDriver(
+    TktUsbDriver *
+);
+
 int startTktUsbDriver(
+    TktUsbDriver *
+);
+
+void stopTktUsbDriver(
     TktUsbDriver *
 );
 

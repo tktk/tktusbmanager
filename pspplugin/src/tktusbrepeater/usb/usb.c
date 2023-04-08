@@ -7,9 +7,21 @@ int startUsbBus(
     return 0;
 }
 
+void stopUsbBus(
+)
+{
+    //TODO
+}
+
 int activateUsb(
 )
 {
     //TODO
     return 0;
+}
+
+void deactivateUsb(
+)
+{
+    //TODO
 }

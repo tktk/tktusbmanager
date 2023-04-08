@@ -26,10 +26,24 @@ int registerTktUsbDriver(
     return 0;
 }
 
+void unregisterTktUsbDriver(
+    TktUsbDriver *  _driver
+)
+{
+    //TODO
+}
+
 int startTktUsbDriver(
     TktUsbDriver *  _driver
 )
 {
     //TODO
     return 0;
+}
+
+void stopTktUsbDriver(
+    TktUsbDriver *  _driver
+)
+{
+    //TODO
 }

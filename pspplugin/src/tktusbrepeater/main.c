@@ -151,6 +151,17 @@ static int startUsb(
     return 0;
 }
 
+static void stopUsb(
+)
+{
+    deactivateUsb();
+    stopTktUsbDriver( &usbDriver );
+    stopUsbBus();
+    unregisterTktUsbDriver( &usbDriver );
+
+    freeTktUsbDriver( &usbDriver );
+}
+
 int module_start(
     SceSize     _args
     , void *    _argp
@@ -174,8 +185,7 @@ int module_stop(
     , void *    _argp
 )
 {
-    //TODO USB無効化
-    //TODO USBドライバの登録解除
+    stopUsb();
 
     freeTktUsbEndpoints( &usbEndpoints );
 
