@@ -1,4 +1,6 @@
 #include "tktusbrepeater/usb/endpoints.h"
+#include "tktusbrepeater/usb/driver.h"
+#include "tktusbrepeater/usb/usb.h"
 #include "tktusbrepeater/config/config.h"
 #include "tktusbrepeater/common/parson.h"
 #include <pspkernel.h>
@@ -21,21 +23,23 @@ enum {
     TKTUSBREPEATER_DRIVERPID = 0x1c9,
 };
 
-static TktUsbEndpoints  endpoints;
+static TktUsbEndpoints  usbEndpoints;
 
-static int initializeEndpoints(
-    TktUsbEndpoints *               _endpoints
+static TktUsbDriver usbDriver;
+
+static int initializeUsbEndpoints(
+    TktUsbEndpoints *               _usbEndpoints
     , const TktUsbRepeaterConfig *  _CONFIG
 )
 {
     int result;
 
-    TktUsbEndpoints endpoints;
+    TktUsbEndpoints usbEndpoints_;
 
     const size_t    ENDPOINTS_COUNT = _CONFIG->endpointsCount;
 
     result = allocTktUsbEndpoints(
-        &endpoints
+        &usbEndpoints_
         , ENDPOINTS_COUNT
     );
     if( result != 0 ) {
@@ -47,22 +51,22 @@ static int initializeEndpoints(
         const TktUsbRepeaterConfigEndpoint *    ENDPOINT_CONFIG = _CONFIG->endpoints + i;
 
         result = allocTktUsbEndpoint(
-            endpoints.endpoints + i
+            usbEndpoints_.endpoints + i
             , ENDPOINT_CONFIG->nameSize
             , ENDPOINT_CONFIG->name
             , ENDPOINT_CONFIG->endpoint
         );
         if( result != 0 ) {
-            freeTktUsbEndpoints( &endpoints );
+            freeTktUsbEndpoints( &usbEndpoints_ );
 
             return result;
         }
     }
 
     memcpy(
-        _endpoints
-        , &endpoints
-        , sizeof( endpoints )
+        _usbEndpoints
+        , &usbEndpoints_
+        , sizeof( usbEndpoints_ )
     );
 
     return 0;
@@ -83,14 +87,68 @@ static int applyConfigFile(
         return result;
     }
 
-    result = initializeEndpoints(
-        &endpoints
+    result = initializeUsbEndpoints(
+        &usbEndpoints
         , &config
     );
 
     unloadConfig( &config );
 
     return result;
+}
+
+static int registerAndStartUsb(
+    TktUsbDriver *  _usbDriver
+)
+{
+    int result;
+
+    result = registerTktUsbDriver( _usbDriver );
+    if( result != 0 ) {
+        return result;
+    }
+
+    result = startUsbBus();
+    if( result != 0 ) {
+        return result;
+    }
+
+    result = startTktUsbDriver( _usbDriver );
+    if( result != 0 ) {
+        return result;
+    }
+
+    result = activateUsb();
+    if( result != 0 ) {
+        return result;
+    }
+
+    return 0;
+}
+
+static int startUsb(
+)
+{
+    int result;
+
+    result = allocTktUsbDriver(
+        &usbDriver
+        , TKTUSBREPEATER_DRIVERNAME
+        , &usbEndpoints
+    );
+    if( result != 0 ) {
+        return result;
+    }
+
+    result = registerAndStartUsb( &usbDriver );
+    if( result != 0 ) {
+        freeTktUsbDriver( &usbDriver );
+        freeTktUsbEndpoints( &usbEndpoints );
+
+        return result;
+    }
+
+    return 0;
 }
 
 int module_start(
@@ -104,30 +162,9 @@ int module_start(
         return 0;
     }
 
-    //TODO USBドライバの登録
-
-    //TODO USB有効化
-/*
-    if( sceUsbStart(
-        PSP_USBBUS_DRIVERNAME
-        , 0
-        , 0
-    ) != 0 ) {
+    if( startUsb() != 0 ) {
         return 0;
     }
-
-    if( sceUsbStart(
-        TKTUSBREPEATER_DRIVERNAME
-        , 0
-        , 0
-    ) != 0 ) {
-        return 0;
-    }
-
-    if( sceUsbActivate( TKTUSBREPEATER_DRIVERPID ) != 0 ) {
-        return 0;
-    }
-*/
 
     return 0;
 }
@@ -140,7 +177,7 @@ int module_stop(
     //TODO USB無効化
     //TODO USBドライバの登録解除
 
-    freeTktUsbEndpoints( &endpoints );
+    freeTktUsbEndpoints( &usbEndpoints );
 
     return 0;
 }

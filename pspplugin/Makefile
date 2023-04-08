@@ -4,6 +4,8 @@ OBJS += \
     src/tktusbrepeater/main.o \
     src/tktusbrepeater/usb/endpoints.o \
     src/tktusbrepeater/usb/endpoint.o \
+    src/tktusbrepeater/usb/driver.o \
+    src/tktusbrepeater/usb/usb.o \
     src/tktusbrepeater/config/config.o \
     src/tktusbrepeater/common/parson.o \
     src/tktusbrepeater/common/file.o \
