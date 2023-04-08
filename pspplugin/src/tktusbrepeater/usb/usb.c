@@ -35,5 +35,5 @@ int activateUsb(
 void deactivateUsb(
 )
 {
-    //TODO
+    sceUsbDeactivate( USB_DRIVER_PID );
 }
