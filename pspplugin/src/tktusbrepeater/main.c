@@ -1,5 +1,4 @@
 #include "tktusbrepeater/usb/endpoints.h"
-#include "tktusbrepeater/usb/endpoint.h"
 #include "tktusbrepeater/config/config.h"
 #include "tktusbrepeater/common/parson.h"
 #include <pspkernel.h>
@@ -140,6 +139,8 @@ int module_stop(
 {
     //TODO USB無効化
     //TODO USBドライバの登録解除
+
+    freeEndpoints( &endpoints );
 
     return 0;
 }

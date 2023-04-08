@@ -1,4 +1,7 @@
 #include "tktusbrepeater/usb/endpoint.h"
+#include "tktusbrepeater/common/memory.h"
+#include <pspkerneltypes.h>
+#include <string.h>
 #include <stddef.h>
 
 int allocEndpoint(
@@ -8,7 +11,24 @@ int allocEndpoint(
     , char              _ENDPOINT
 )
 {
-    //TODO
+    SceUID  nameId = allocMemory( _NAME_SIZE * sizeof( *( _endpoint->name ) ) );
+    if( nameId < 0 ) {
+        return 1;
+    }
+
+    char *  name = ( char * )getMemoryAddress( nameId );
+
+    memcpy(
+        name
+        , _NAME
+        , _NAME_SIZE
+    );
+
+    _endpoint->nameId = nameId;
+    _endpoint->nameSize = _NAME_SIZE;
+    _endpoint->name = name;
+    _endpoint->endpoint = _ENDPOINT;
+
     return 0;
 }
 
@@ -16,5 +36,7 @@ void freeEndpoint(
     TktUsbEndpoint *    _endpoint
 )
 {
-    //TODO
+    freeMemory( _endpoint->nameId );
+
+    _endpoint->nameId = 0;
 }
