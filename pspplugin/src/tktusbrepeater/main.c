@@ -34,7 +34,7 @@ static int initializeEndpoints(
 
     const size_t    ENDPOINTS_COUNT = _CONFIG->endpointsCount;
 
-    result = allocEndpoints(
+    result = allocTktUsbEndpoints(
         &endpoints
         , ENDPOINTS_COUNT
     );
@@ -53,7 +53,7 @@ static int initializeEndpoints(
             , ENDPOINT_CONFIG->endpoint
         );
         if( result != 0 ) {
-            freeEndpoints( &endpoints );
+            freeTktUsbEndpoints( &endpoints );
 
             return result;
         }
@@ -140,7 +140,7 @@ int module_stop(
     //TODO USB無効化
     //TODO USBドライバの登録解除
 
-    freeEndpoints( &endpoints );
+    freeTktUsbEndpoints( &endpoints );
 
     return 0;
 }

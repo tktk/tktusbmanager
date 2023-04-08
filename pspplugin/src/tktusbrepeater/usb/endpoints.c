@@ -4,7 +4,7 @@
 #include <pspkerneltypes.h>
 #include <stddef.h>
 
-int allocEndpoints(
+int allocTktUsbEndpoints(
     TktUsbEndpoints *   _endpoints
     , size_t            _ENDPOINTS_COUNT
 )
@@ -30,7 +30,7 @@ int allocEndpoints(
     return 0;
 }
 
-void freeEndpoints(
+void freeTktUsbEndpoints(
     TktUsbEndpoints *   _endpoints
 )
 {

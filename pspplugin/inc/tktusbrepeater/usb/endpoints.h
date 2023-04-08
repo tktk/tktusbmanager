@@ -12,12 +12,12 @@ typedef struct
     TktUsbEndpoint *    endpoints;
 } TktUsbEndpoints;
 
-int allocEndpoints(
+int allocTktUsbEndpoints(
     TktUsbEndpoints *
     , size_t
 );
 
-void freeEndpoints(
+void freeTktUsbEndpoints(
     TktUsbEndpoints *
 );
 
