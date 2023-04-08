@@ -119,7 +119,7 @@ typedef struct json_string {
 // Type definitions
 typedef union json_value_value {
     JSON_String string;
-    double      number;
+    long        number;
     struct {
         SceUID          objectId;
         JSON_Object *   object;
@@ -189,8 +189,8 @@ static JSON_Status parse_utf16_hex(const char *string, unsigned int *result);
 static int         num_bytes_in_utf8_sequence(unsigned char c);
 static JSON_Status   verify_utf8_sequence(const unsigned char *string, int *len);
 static parson_bool_t is_valid_utf8(const char *string, size_t string_len);
-*/
 static parson_bool_t is_decimal(const char *string, size_t length);
+*/
 static unsigned long hash_string(const char *string, size_t n);
 
 // JSON Object
@@ -511,7 +511,6 @@ static int is_valid_utf8(const char *string, size_t string_len) {
     }
     return PARSON_TRUE;
 }
-*/
 
 static parson_bool_t is_decimal(const char *string, size_t length) {
     if (length > 1 && string[0] == '0' && string[1] != '.') {
@@ -527,6 +526,7 @@ static parson_bool_t is_decimal(const char *string, size_t length) {
     }
     return PARSON_TRUE;
 }
+*/
 
 static unsigned long hash_string(const char *string, size_t n) {
 #ifdef PARSON_FORCE_HASH_COLLISIONS
@@ -1602,16 +1602,12 @@ static JSON_Value * parse_number_value(
     char *  end;
 
     errno = 0;
-    double  number = strtod(
+    long    number = strtol(
         *string
         , &end
+        , 0
     );
-    if( errno == ERANGE && ( number <= -HUGE_VAL || number >= HUGE_VAL ) ) {
-        return NULL;
-    } else if( ( errno && errno != ERANGE ) || !is_decimal(
-        *string
-        , end - *string
-    ) ) {
+    if( errno != 0 ) {
         return NULL;
     }
     *string = end;
@@ -2138,7 +2134,7 @@ size_t json_value_get_string_len(const JSON_Value *value) {
 }
 */
 
-double json_value_get_number(const JSON_Value *value) {
+long json_value_get_number(const JSON_Value *value) {
     return json_value_get_type(value) == JSONNumber ? value->value.number : 0;
 }
 
@@ -2276,13 +2272,9 @@ JSON_Value * json_value_init_string_with_len(const char *string, size_t length) 
 
 JSON_Value * json_value_init_number(
     SceUID *    valueIdPtr
-    , double    number
+    , long      number
 )
 {
-    if( IS_NUMBER_INVALID( number ) ) {
-        return NULL;
-    }
-
     SceUID  valueId = parson_malloc( sizeof( JSON_Value ) );
 
     JSON_Value *    new_value = ( JSON_Value * )parson_get_addr( valueId );
