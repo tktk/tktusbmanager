@@ -19,10 +19,6 @@ PSP_MODULE_INFO(
 
 #define CONFIG_FILE_PATH "ms0:/SEPLUGINS/tktusbrepeater.cfg"
 
-enum {
-    TKTUSBREPEATER_DRIVERPID = 0x1c9,
-};
-
 static TktUsbEndpoints  usbEndpoints;
 
 static TktUsbDriver usbDriver;

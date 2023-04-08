@@ -2,6 +2,10 @@
 #include <psptypes.h>
 #include <pspusb.h>
 
+enum {
+    USB_DRIVER_PID = 0x1c9,
+};
+
 int startUsbBus(
 )
 {
@@ -25,8 +29,7 @@ void stopUsbBus(
 int activateUsb(
 )
 {
-    //TODO
-    return 0;
+    return sceUsbActivate( USB_DRIVER_PID );
 }
 
 void deactivateUsb(
