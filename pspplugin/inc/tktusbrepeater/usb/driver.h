@@ -8,7 +8,7 @@
 
 typedef struct
 {
-    //TODO
+    struct UsbDriver    usbDriver;
 } TktUsbDriver;
 
 int allocTktUsbDriver(

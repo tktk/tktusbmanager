@@ -22,8 +22,7 @@ int registerTktUsbDriver(
     TktUsbDriver *  _driver
 )
 {
-    //TODO
-    return 0;
+    return sceUsbbdRegister( &( _driver->usbDriver ) );
 }
 
 void unregisterTktUsbDriver(
