@@ -465,7 +465,9 @@ void freeTktUsbDriver(
     TktUsbDriver *  _driver
 )
 {
-    //TODO
+    freeMemory( _driver->memoryId );
+
+    _driver->memoryId = 0;
 }
 
 int registerTktUsbDriver(
