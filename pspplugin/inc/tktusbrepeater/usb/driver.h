@@ -9,6 +9,8 @@
 typedef struct
 {
     struct UsbDriver    usbDriver;
+
+    SceUID  memoryId;
 } TktUsbDriver;
 
 int allocTktUsbDriver(
