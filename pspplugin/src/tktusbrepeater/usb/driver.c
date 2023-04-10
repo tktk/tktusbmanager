@@ -33,12 +33,6 @@ static void initializeUsbEndpoints(
     , const size_t              _USB_ENDPOINTS_COUNT
 )
 {
-    memset(
-        _usbEndpoints
-        , 0
-        , _USB_ENDPOINTS_COUNT * sizeof( *_usbEndpoints )
-    );
-
     struct UsbEndpoint *    userUsbEndpoints = _usbEndpoints + 1;
 
     size_t  i;
@@ -179,12 +173,6 @@ static void initializeUsbData(
     , const size_t  _ENDPOINTS_COUNT
 )
 {
-    memset(
-        _usbData
-        , 0
-        , sizeof( *_usbData )
-    );
-
     initializeUsbDataDeviceDescriptor( _usbData->devdesc );
     initializeUsbDataConfig(
         &( _usbData->config )
@@ -395,40 +383,46 @@ int allocTktUsbDriver(
 {
     struct UsbDriver *  usbDriver = &( _driver->usbDriver );
 
-    const size_t    ENDPOINTS_COUNT = _ENDPOINTS->endpointsCount;
+    const size_t    USER_ENDPOINTS_COUNT = _ENDPOINTS->endpointsCount;
 
-    const size_t    USB_ENDPOINTS_COUNT = ENDPOINTS_COUNT + 1;
+    const size_t    ALL_ENDPOINTS_COUNT = USER_ENDPOINTS_COUNT + 1;
 
-    SceUID  memoryId = allocMemory(
-        USB_ENDPOINTS_COUNT * sizeof( struct UsbEndpoint )
-            + sizeof( struct UsbInterface )
-            + sizeof( UsbData_ )
-            + ENDPOINTS_COUNT * sizeof( struct Endp )
-            + sizeof( UsbData_ )
-            + ENDPOINTS_COUNT * sizeof( struct Endp )
-            + STRING_DESCRIPTOR_SIZE
-    );
+    const SceSize   MEMORY_SIZE = ALL_ENDPOINTS_COUNT * sizeof( struct UsbEndpoint )
+        + sizeof( struct UsbInterface )
+        + sizeof( UsbData_ )
+        + ALL_ENDPOINTS_COUNT * sizeof( struct Endp )
+        + sizeof( UsbData_ )
+        + ALL_ENDPOINTS_COUNT * sizeof( struct Endp )
+        + STRING_DESCRIPTOR_SIZE
+    ;
+
+    SceUID  memoryId = allocMemory( MEMORY_SIZE );
 
     void *  memoryPtr = getMemoryAddress( memoryId );
+    memset(
+        memoryPtr
+        , 0
+        , MEMORY_SIZE
+    );
 
     struct UsbEndpoint *    usbEndpoints = ( struct UsbEndpoint * )memoryPtr;
-    struct UsbInterface *   usbInterface = ( struct UsbInterface * )( usbEndpoints + USB_ENDPOINTS_COUNT );
+    struct UsbInterface *   usbInterface = ( struct UsbInterface * )( usbEndpoints + ALL_ENDPOINTS_COUNT );
     UsbData_ *              usbDataHi = ( UsbData_ * )( usbInterface + 1 );
     struct Endp *           usbEndpointDescriptorsHi = ( struct Endp * )( usbDataHi + 1 );
-    UsbData_ *              usbDataFull = ( UsbData_ * )( usbEndpointDescriptorsHi + ENDPOINTS_COUNT );
+    UsbData_ *              usbDataFull = ( UsbData_ * )( usbEndpointDescriptorsHi + ALL_ENDPOINTS_COUNT );
     struct Endp *           usbEndpointDescriptorsFull = ( struct Endp * )( usbDataFull + 1 );
-    unsigned char *         stringDescriptor = ( unsigned char * )( usbEndpointDescriptorsFull + ENDPOINTS_COUNT );
+    unsigned char *         stringDescriptor = ( unsigned char * )( usbEndpointDescriptorsFull + ALL_ENDPOINTS_COUNT );
 
     initializeUsbEndpoints(
         usbEndpoints
         , _ENDPOINTS
-        , USB_ENDPOINTS_COUNT
+        , ALL_ENDPOINTS_COUNT
     );
     initializeUsbInterface( usbInterface );
     initializeUsbData(
         usbDataHi
         , usbEndpointDescriptorsHi
-        , ENDPOINTS_COUNT
+        , USER_ENDPOINTS_COUNT
     );
     initializeUsbEndpointDescriptorsHi(
         usbEndpointDescriptorsHi
@@ -437,7 +431,7 @@ int allocTktUsbDriver(
     initializeUsbData(
         usbDataFull
         , usbEndpointDescriptorsFull
-        , ENDPOINTS_COUNT
+        , USER_ENDPOINTS_COUNT
     );
     initializeUsbEndpointDescriptorsFull(
         usbEndpointDescriptorsFull
@@ -453,7 +447,7 @@ int allocTktUsbDriver(
         , usbDataFull
         , stringDescriptor
         , _DRIVER_NAME
-        , USB_ENDPOINTS_COUNT
+        , ALL_ENDPOINTS_COUNT
     );
 
     _driver->memoryId = memoryId;
