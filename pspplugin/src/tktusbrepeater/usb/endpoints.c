@@ -47,3 +47,12 @@ void freeTktUsbEndpoints(
 
     _endpoints->endpointsId = 0;
 }
+
+int initializeTktUsbEndpoints(
+    TktUsbEndpoints *   _endpoints
+    , TktUsbDriver *    _driver
+)
+{
+    //TODO
+    return 0;
+}

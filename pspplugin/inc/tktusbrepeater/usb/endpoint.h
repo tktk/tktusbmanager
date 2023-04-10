@@ -1,11 +1,12 @@
 #ifndef TKTUSBREPEATER_USB_ENDPOINT_H
 #define TKTUSBREPEATER_USB_ENDPOINT_H
 
+#include "tktusbrepeater/def/usb/endpoint.h"
 #include <pspusbbus.h>
 #include <pspkerneltypes.h>
 #include <stddef.h>
 
-typedef struct
+typedef struct TktUsbEndpoint
 {
     SceUID  nameId;
     size_t  nameSize;

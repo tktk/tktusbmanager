@@ -1,12 +1,13 @@
 #ifndef TKTUSBREPEATER_USB_DRIVER_H
 #define TKTUSBREPEATER_USB_DRIVER_H
 
-#include "tktusbrepeater/usb/endpoints.h"
+#include "tktusbrepeater/def/usb/driver.h"
+#include "tktusbrepeater/def/usb/endpoints.h"
 #include <pspusbbus.h>
 #include <pspkerneltypes.h>
 #include <stddef.h>
 
-typedef struct
+typedef struct TktUsbDriver
 {
     struct UsbDriver    usbDriver;
 

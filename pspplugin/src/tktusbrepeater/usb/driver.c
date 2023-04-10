@@ -1,5 +1,6 @@
 #include "tktusbrepeater/usb/driver.h"
 #include "tktusbrepeater/usb/endpoints.h"
+#include "tktusbrepeater/usb/endpoint.h"
 #include "tktusbrepeater/common/memory.h"
 #include <pspusbbus.h>
 #include <pspusb.h>

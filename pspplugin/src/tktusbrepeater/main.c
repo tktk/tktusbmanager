@@ -1,4 +1,5 @@
 #include "tktusbrepeater/usb/endpoints.h"
+#include "tktusbrepeater/usb/endpoint.h"
 #include "tktusbrepeater/usb/driver.h"
 #include "tktusbrepeater/usb/usb.h"
 #include "tktusbrepeater/config/config.h"
@@ -133,6 +134,17 @@ static int startUsb(
         , &usbEndpoints
     );
     if( result != 0 ) {
+        return result;
+    }
+
+    result = initializeTktUsbEndpoints(
+        &usbEndpoints
+        , &usbDriver
+    );
+    if( result != 0 ) {
+        freeTktUsbDriver( &usbDriver );
+        freeTktUsbEndpoints( &usbEndpoints );
+
         return result;
     }
 
