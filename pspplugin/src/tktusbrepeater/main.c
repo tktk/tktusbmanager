@@ -137,16 +137,10 @@ static int startUsb(
         return result;
     }
 
-    result = initializeTktUsbEndpoints(
+    initializeTktUsbEndpoints(
         &usbEndpoints
         , &usbDriver
     );
-    if( result != 0 ) {
-        freeTktUsbDriver( &usbDriver );
-        freeTktUsbEndpoints( &usbEndpoints );
-
-        return result;
-    }
 
     result = registerAndStartUsb( &usbDriver );
     if( result != 0 ) {

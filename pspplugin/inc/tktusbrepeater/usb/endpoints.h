@@ -23,7 +23,7 @@ void freeTktUsbEndpoints(
     TktUsbEndpoints *
 );
 
-int initializeTktUsbEndpoints(
+void initializeTktUsbEndpoints(
     TktUsbEndpoints *
     , TktUsbDriver *
 );

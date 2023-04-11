@@ -1,5 +1,6 @@
 #include "tktusbrepeater/usb/endpoints.h"
 #include "tktusbrepeater/usb/endpoint.h"
+#include "tktusbrepeater/usb/driver.h"
 #include "tktusbrepeater/common/memory.h"
 #include <pspkerneltypes.h>
 #include <stddef.h>
@@ -48,11 +49,23 @@ void freeTktUsbEndpoints(
     _endpoints->endpointsId = 0;
 }
 
-int initializeTktUsbEndpoints(
+void initializeTktUsbEndpoints(
     TktUsbEndpoints *   _endpoints
     , TktUsbDriver *    _driver
 )
 {
-    //TODO
-    return 0;
+    const size_t    ENDPOINT_COUNT = _endpoints->endpointsCount;
+
+    struct UsbEndpoint *    userUsbEndpoints = _driver->usbDriver.endp + 1;
+
+    size_t  i;
+    for( i = 0 ; i < ENDPOINT_COUNT ; i++ ) {
+        TktUsbEndpoint *        endpoint = _endpoints->endpoints + i;
+        struct UsbEndpoint *    userUsbEndpoint = userUsbEndpoints + i;
+
+        initializeTktUsbEndpoint(
+            endpoint
+            , userUsbEndpoint
+        );
+    }
 }

@@ -28,4 +28,9 @@ void freeTktUsbEndpoint(
     TktUsbEndpoint *
 );
 
+void initializeTktUsbEndpoint(
+    TktUsbEndpoint *
+    , struct UsbEndpoint *
+);
+
 #endif  // TKTUSBREPEATER_USB_ENDPOINT_H

@@ -40,3 +40,11 @@ void freeTktUsbEndpoint(
 
     _endpoint->nameId = 0;
 }
+
+void initializeTktUsbEndpoint(
+    TktUsbEndpoint *        _endpoint
+    , struct UsbEndpoint *  _usbEndpoint
+)
+{
+    //TODO
+}
