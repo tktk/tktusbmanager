@@ -1,6 +1,7 @@
 TARGET = tktusbrepeater
 
 OBJS += \
+    src/tktusbrepeater/exports.o \
     src/tktusbrepeater/main.o \
     src/tktusbrepeater/usb/endpoints.o \
     src/tktusbrepeater/usb/endpoint.o \

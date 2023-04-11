@@ -1,3 +1,4 @@
+#include "tktusbrepeater/tktusbrepeater.h"
 #include "tktusbrepeater/usb/endpoints.h"
 #include "tktusbrepeater/usb/endpoint.h"
 #include "tktusbrepeater/usb/driver.h"
@@ -191,5 +192,43 @@ int module_stop(
 
     freeTktUsbEndpoints( &usbEndpoints );
 
+    return 0;
+}
+
+TktUsbEndpointR * tktUsbGetEndpointR(
+    const char *    _NAME
+    , size_t        _nameLength
+)
+{
+    //TODO
+    return NULL;
+}
+
+TktUsbEndpointW * tktUsbGetEndpointW(
+    const char *    _NAME
+    , size_t        _nameLength
+)
+{
+    //TODO
+    return NULL;
+}
+
+int tktUsbRead(
+    TktUsbEndpointR *   _endpoint
+    , void *            _buffer
+    , int               _bufferSize
+)
+{
+    //TODO
+    return 0;
+}
+
+int tktUsbWrite(
+    TktUsbEndpointW *   _endpoint
+    , const void *      _BUFFER
+    , int               _bufferSize
+)
+{
+    //TODO
     return 0;
 }
