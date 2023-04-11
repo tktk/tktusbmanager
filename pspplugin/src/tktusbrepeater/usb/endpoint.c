@@ -46,5 +46,5 @@ void initializeTktUsbEndpoint(
     , struct UsbEndpoint *  _usbEndpoint
 )
 {
-    //TODO
+    _endpoint->usbEndpoint = _usbEndpoint;
 }
