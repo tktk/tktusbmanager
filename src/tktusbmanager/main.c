@@ -197,16 +197,28 @@ int module_stop(
 
 TktUsbEndpointR * tktUsbGetEndpointR(
     const char *    _NAME
-    , size_t        _nameLength
+    , size_t        _NAME_LENGTH
 )
 {
-    //TODO
-    return NULL;
+    TktUsbEndpoint *    endpoint = getEndpointTktUsbEndpoints(
+        &usbEndpoints
+        , _NAME
+        , _NAME_LENGTH
+    );
+    if( endpoint == NULL ) {
+        return NULL;
+    }
+
+    if( isReadableTktUsbEndpoint( endpoint ) != 0 ) {
+        return NULL;
+    }
+
+    return ( TktUsbEndpointR * )endpoint;
 }
 
 TktUsbEndpointW * tktUsbGetEndpointW(
     const char *    _NAME
-    , size_t        _nameLength
+    , size_t        _NAME_LENGTH
 )
 {
     //TODO
