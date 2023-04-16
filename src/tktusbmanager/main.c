@@ -200,9 +200,9 @@ typedef int ( * IsEnableEndpoint )(
 );
 
 static TktUsbEndpoint * tktUsbGetEndpoint(
-    const char *        _NAME
+    IsEnableEndpoint    _IS_ENABLE_ENDPOINT
+    , const char *      _NAME
     , size_t            _NAME_LENGTH
-    , IsEnableEndpoint  _IS_ENABLE_ENDPOINT
 )
 {
     TktUsbEndpoint *    endpoint = getEndpointTktUsbEndpoints(
@@ -227,9 +227,9 @@ TktUsbEndpointR * tktUsbGetEndpointR(
 )
 {
     return ( TktUsbEndpointR * )tktUsbGetEndpoint(
-        _NAME
+        isReadableTktUsbEndpoint
+        , _NAME
         , _NAME_LENGTH
-        , isReadableTktUsbEndpoint
     );
 }
 
@@ -239,9 +239,9 @@ TktUsbEndpointW * tktUsbGetEndpointW(
 )
 {
     return ( TktUsbEndpointW * )tktUsbGetEndpoint(
-        _NAME
+        isWritableTktUsbEndpoint
+        , _NAME
         , _NAME_LENGTH
-        , isWritableTktUsbEndpoint
     );
 }
 

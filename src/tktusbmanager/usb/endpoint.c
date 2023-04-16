@@ -7,6 +7,8 @@
 
 enum {
     USB_ENDPOINT_IN = 0x80,
+
+    USB_WAITING = 0x1,
 };
 
 int allocTktUsbEndpoint(
@@ -100,11 +102,7 @@ int isWritableTktUsbEndpoint(
     return ( _ENDPOINT->endpoint & USB_ENDPOINT_IN ) == USB_ENDPOINT_IN;
 }
 
-enum {
-    USB_WAITING = 0x1,
-};
-
-int readRequestDone(
+static int usbRequestDone(
     struct UsbdDeviceReq *  _request
     , int                   _arg2
     , int                   _arg3
@@ -120,6 +118,43 @@ int readRequestDone(
     return 0;
 }
 
+typedef int ( * SceUsbbdRequest )(
+    struct UsbdDeviceReq *
+);
+
+static void requestTktUsbEndpoint(
+    SceUsbbdRequest             _SCE_USBBD_REQUEST
+    , struct UsbdDeviceReq *    _request
+    , TktUsbEndpoint *          _endpoint
+    , void *                    _buffer
+    , int                       _BUFFER_SIZE
+)
+{
+    u32 result;
+
+    memset(
+        _request
+        , 0
+        , sizeof( *_request )
+    );
+
+    _request->endp = _endpoint->usbEndpoint;
+    _request->data = _buffer;
+    _request->size = _BUFFER_SIZE;
+    _request->func = usbRequestDone;
+    _request->arg = _endpoint;
+
+    _SCE_USBBD_REQUEST( _request );
+
+    sceKernelWaitEventFlag(
+        _endpoint->eventFlagId
+        , USB_WAITING
+        , PSP_EVENT_WAITOR | PSP_EVENT_WAITCLEAR
+        , &result
+        , NULL
+    );
+}
+
 int readTktUsbEndpoint(
     TktUsbEndpoint *    _endpoint
     , void *            _buffer
@@ -128,28 +163,12 @@ int readTktUsbEndpoint(
 {
     struct UsbdDeviceReq    request;
 
-    u32 result;
-
-    memset(
-        &request
-        , 0
-        , sizeof( request )
-    );
-
-    request.endp = _endpoint->usbEndpoint;
-    request.data = _buffer;
-    request.size = _BUFFER_SIZE;
-    request.func = readRequestDone;
-    request.arg = _endpoint;
-
-    sceUsbbdReqRecv( &request );
-
-    sceKernelWaitEventFlag(
-        _endpoint->eventFlagId
-        , USB_WAITING
-        , PSP_EVENT_WAITOR | PSP_EVENT_WAITCLEAR
-        , &result
-        , NULL
+    requestTktUsbEndpoint(
+        sceUsbbdReqRecv
+        , &request
+        , _endpoint
+        , _buffer
+        , _BUFFER_SIZE
     );
 
     int returnCode = request.retcode;
@@ -167,6 +186,15 @@ int writeTktUsbEndpoint(
     , int               _DATA_SIZE
 )
 {
-    //TODO
-    return -1;
+    struct UsbdDeviceReq    request;
+
+    requestTktUsbEndpoint(
+        sceUsbbdReqSend
+        , &request
+        , _endpoint
+        , _data
+        , _DATA_SIZE
+    );
+
+    return request.retcode;
 }
