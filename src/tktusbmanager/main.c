@@ -260,10 +260,13 @@ int tktUsbRead(
 
 int tktUsbWrite(
     TktUsbEndpointW *   _endpoint
-    , const void *      _BUFFER
-    , int               _bufferSize
+    , const void *      _DATA
+    , int               _DATA_SIZE
 )
 {
-    //TODO
-    return 0;
+    return writeTktUsbEndpoint(
+        ( TktUsbEndpoint * )_endpoint
+        , _DATA
+        , _DATA_SIZE
+    );
 }
