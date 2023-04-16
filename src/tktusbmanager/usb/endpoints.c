@@ -69,3 +69,25 @@ void initializeTktUsbEndpoints(
         );
     }
 }
+
+TktUsbEndpoint * getEndpointTktUsbEndpoints(
+    TktUsbEndpoints *   _endpoints
+    , const char *      _NAME
+    , size_t            _NAME_SIZE
+)
+{
+    size_t  i;
+    for( i = 0 ; i < _endpoints->endpointsCount ; i++ ) {
+        TktUsbEndpoint *    endpoint = _endpoints->endpoints + i;
+
+        if( equalsNameTktUsbEndpoint(
+            endpoint
+            , _NAME
+            , _NAME_SIZE
+        ) == 0 ) {
+            return endpoint;
+        }
+    }
+
+    return NULL;
+}

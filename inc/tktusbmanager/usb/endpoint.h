@@ -33,4 +33,10 @@ void initializeTktUsbEndpoint(
     , struct UsbEndpoint *
 );
 
+int equalsNameTktUsbEndpoint(
+    const TktUsbEndpoint *
+    , const char *
+    , size_t
+);
+
 #endif  // TKTUSBMANAGER_USB_ENDPOINT_H

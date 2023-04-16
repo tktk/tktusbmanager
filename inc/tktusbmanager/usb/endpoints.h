@@ -28,4 +28,10 @@ void initializeTktUsbEndpoints(
     , TktUsbDriver *
 );
 
+TktUsbEndpoint * getEndpointTktUsbEndpoints(
+    TktUsbEndpoints *
+    , const char *
+    , size_t
+);
+
 #endif  // TKTUSBMANAGER_USB_ENDPOINTS_H

@@ -48,3 +48,13 @@ void initializeTktUsbEndpoint(
 {
     _endpoint->usbEndpoint = _usbEndpoint;
 }
+
+int equalsNameTktUsbEndpoint(
+    const TktUsbEndpoint *  _ENDPOINT
+    , const char *          _NAME
+    , size_t                _NAME_SIZE
+)
+{
+    //TODO
+    return -1;
+}
