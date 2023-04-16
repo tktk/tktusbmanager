@@ -195,9 +195,14 @@ int module_stop(
     return 0;
 }
 
-TktUsbEndpointR * tktUsbGetEndpointR(
-    const char *    _NAME
-    , size_t        _NAME_LENGTH
+typedef int ( * IsEnableEndpoint )(
+    const TktUsbEndpoint *
+);
+
+static TktUsbEndpoint * tktUsbGetEndpoint(
+    const char *        _NAME
+    , size_t            _NAME_LENGTH
+    , IsEnableEndpoint  _IS_ENABLE_ENDPOINT
 )
 {
     TktUsbEndpoint *    endpoint = getEndpointTktUsbEndpoints(
@@ -209,11 +214,23 @@ TktUsbEndpointR * tktUsbGetEndpointR(
         return NULL;
     }
 
-    if( isReadableTktUsbEndpoint( endpoint ) != 0 ) {
+    if( _IS_ENABLE_ENDPOINT( endpoint ) != 0 ) {
         return NULL;
     }
 
-    return ( TktUsbEndpointR * )endpoint;
+    return endpoint;
+}
+
+TktUsbEndpointR * tktUsbGetEndpointR(
+    const char *    _NAME
+    , size_t        _NAME_LENGTH
+)
+{
+    return ( TktUsbEndpointR * )tktUsbGetEndpoint(
+        _NAME
+        , _NAME_LENGTH
+        , isReadableTktUsbEndpoint
+    );
 }
 
 TktUsbEndpointW * tktUsbGetEndpointW(
@@ -221,20 +238,11 @@ TktUsbEndpointW * tktUsbGetEndpointW(
     , size_t        _NAME_LENGTH
 )
 {
-    TktUsbEndpoint *    endpoint = getEndpointTktUsbEndpoints(
-        &usbEndpoints
-        , _NAME
+    return ( TktUsbEndpointW * )tktUsbGetEndpoint(
+        _NAME
         , _NAME_LENGTH
+        , isWritableTktUsbEndpoint
     );
-    if( endpoint == NULL ) {
-        return NULL;
-    }
-
-    if( isWritableTktUsbEndpoint( endpoint ) != 0 ) {
-        return NULL;
-    }
-
-    return ( TktUsbEndpointW * )endpoint;
 }
 
 int tktUsbRead(
