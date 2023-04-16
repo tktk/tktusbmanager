@@ -55,6 +55,13 @@ int equalsNameTktUsbEndpoint(
     , size_t                _NAME_SIZE
 )
 {
-    //TODO
-    return -1;
+    if( _ENDPOINT->nameSize != _NAME_SIZE ) {
+        return 1;
+    }
+
+    return memcmp(
+        _ENDPOINT->name
+        , _NAME
+        , _NAME_SIZE
+    );
 }
