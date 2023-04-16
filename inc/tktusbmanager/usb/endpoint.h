@@ -14,6 +14,8 @@ typedef struct TktUsbEndpoint
 
     char    endpoint;
 
+    SceUID  eventFlagId;
+
     struct UsbEndpoint *    usbEndpoint;
 } TktUsbEndpoint;
 

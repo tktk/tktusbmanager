@@ -1,5 +1,6 @@
 #include "tktusbmanager/usb/endpoint.h"
 #include "tktusbmanager/common/memory.h"
+#include <pspthreadman.h>
 #include <pspkerneltypes.h>
 #include <string.h>
 #include <stddef.h>
@@ -15,8 +16,20 @@ int allocTktUsbEndpoint(
     , char              _ENDPOINT
 )
 {
+    SceUID  eventFlagId = sceKernelCreateEventFlag(
+        "tktusbmanager"
+        , PSP_EVENT_WAITMULTIPLE
+        , 0
+        , NULL
+    );
+    if( eventFlagId < 0 ) {
+        return 1;
+    }
+
     SceUID  nameId = allocMemory( _NAME_SIZE * sizeof( *( _endpoint->name ) ) );
     if( nameId < 0 ) {
+        sceKernelDeleteEventFlag( eventFlagId );
+
         return 1;
     }
 
@@ -32,6 +45,7 @@ int allocTktUsbEndpoint(
     _endpoint->nameSize = _NAME_SIZE;
     _endpoint->name = name;
     _endpoint->endpoint = _ENDPOINT;
+    _endpoint->eventFlagId = eventFlagId;
 
     return 0;
 }
@@ -41,8 +55,10 @@ void freeTktUsbEndpoint(
 )
 {
     freeMemory( _endpoint->nameId );
-
     _endpoint->nameId = 0;
+
+    sceKernelDeleteEventFlag( _endpoint->eventFlagId );
+    _endpoint->eventFlagId = 0;
 }
 
 void initializeTktUsbEndpoint(
