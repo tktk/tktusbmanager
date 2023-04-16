@@ -1,6 +1,0 @@
-#ifndef TKTUSBREPEATER_DEF_USB_ENDPOINT_H
-#define TKTUSBREPEATER_DEF_USB_ENDPOINT_H
-
-typedef struct TktUsbEndpoint TktUsbEndpoint;
-
-#endif  // TKTUSBREPEATER_DEF_USB_ENDPOINT_H

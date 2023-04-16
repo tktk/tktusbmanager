@@ -1,16 +1,16 @@
-TARGET = tktusbrepeater
+TARGET = tktusbmanager
 
 OBJS += \
-    src/tktusbrepeater/exports.o \
-    src/tktusbrepeater/main.o \
-    src/tktusbrepeater/usb/endpoints.o \
-    src/tktusbrepeater/usb/endpoint.o \
-    src/tktusbrepeater/usb/driver.o \
-    src/tktusbrepeater/usb/usb.o \
-    src/tktusbrepeater/config/config.o \
-    src/tktusbrepeater/common/parson.o \
-    src/tktusbrepeater/common/file.o \
-    src/tktusbrepeater/common/memory.o \
+    src/tktusbmanager/exports.o \
+    src/tktusbmanager/main.o \
+    src/tktusbmanager/usb/endpoints.o \
+    src/tktusbmanager/usb/endpoint.o \
+    src/tktusbmanager/usb/driver.o \
+    src/tktusbmanager/usb/usb.o \
+    src/tktusbmanager/config/config.o \
+    src/tktusbmanager/common/parson.o \
+    src/tktusbmanager/common/file.o \
+    src/tktusbmanager/common/memory.o \
     parson/parson.o \
 
 USE_KERNEL_LIBC = 1

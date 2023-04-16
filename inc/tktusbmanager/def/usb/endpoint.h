@@ -1,0 +1,6 @@
+#ifndef TKTUSBMANAGER_DEF_USB_ENDPOINT_H
+#define TKTUSBMANAGER_DEF_USB_ENDPOINT_H
+
+typedef struct TktUsbEndpoint TktUsbEndpoint;
+
+#endif  // TKTUSBMANAGER_DEF_USB_ENDPOINT_H

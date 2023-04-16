@@ -1,0 +1,6 @@
+#ifndef TKTUSBMANAGER_DEF_USB_DRIVER_H
+#define TKTUSBMANAGER_DEF_USB_DRIVER_H
+
+typedef struct TktUsbDriver TktUsbDriver;
+
+#endif  // TKTUSBMANAGER_DEF_USB_DRIVER_H

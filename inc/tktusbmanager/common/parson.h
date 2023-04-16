@@ -1,0 +1,7 @@
+#ifndef TKTUSBMANAGER_COMMON_PARSON_H
+#define TKTUSBMANAGER_COMMON_PARSON_H
+
+void initializeParson(
+);
+
+#endif  // TKTUSBMANAGER_COMMON_PARSON_H
