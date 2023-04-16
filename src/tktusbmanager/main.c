@@ -221,8 +221,20 @@ TktUsbEndpointW * tktUsbGetEndpointW(
     , size_t        _NAME_LENGTH
 )
 {
-    //TODO
-    return NULL;
+    TktUsbEndpoint *    endpoint = getEndpointTktUsbEndpoints(
+        &usbEndpoints
+        , _NAME
+        , _NAME_LENGTH
+    );
+    if( endpoint == NULL ) {
+        return NULL;
+    }
+
+    if( isWritableTktUsbEndpoint( endpoint ) != 0 ) {
+        return NULL;
+    }
+
+    return ( TktUsbEndpointW * )endpoint;
 }
 
 int tktUsbRead(
