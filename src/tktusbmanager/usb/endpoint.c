@@ -81,6 +81,5 @@ int isWritableTktUsbEndpoint(
     const TktUsbEndpoint *  _ENDPOINT
 )
 {
-    //TODO
-    return -1;
+    return ( _ENDPOINT->endpoint & USB_ENDPOINT_IN ) == USB_ENDPOINT_IN;
 }
