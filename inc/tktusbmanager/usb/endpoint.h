@@ -39,4 +39,12 @@ int equalsNameTktUsbEndpoint(
     , size_t
 );
 
+int isReadableTktUsbEndpoint(
+    const TktUsbEndpoint *
+);
+
+int isWritableTktUsbEndpoint(
+    const TktUsbEndpoint *
+);
+
 #endif  // TKTUSBMANAGER_USB_ENDPOINT_H

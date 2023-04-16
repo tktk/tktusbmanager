@@ -4,6 +4,10 @@
 #include <string.h>
 #include <stddef.h>
 
+enum {
+    USB_ENDPOINT_IN = 0x80,
+};
+
 int allocTktUsbEndpoint(
     TktUsbEndpoint *    _endpoint
     , size_t            _NAME_SIZE
@@ -64,4 +68,19 @@ int equalsNameTktUsbEndpoint(
         , _NAME
         , _NAME_SIZE
     );
+}
+
+int isReadableTktUsbEndpoint(
+    const TktUsbEndpoint *  _ENDPOINT
+)
+{
+    return ( _ENDPOINT->endpoint & USB_ENDPOINT_IN ) == 0;
+}
+
+int isWritableTktUsbEndpoint(
+    const TktUsbEndpoint *  _ENDPOINT
+)
+{
+    //TODO
+    return -1;
 }
