@@ -248,11 +248,14 @@ TktUsbEndpointW * tktUsbGetEndpointW(
 int tktUsbRead(
     TktUsbEndpointR *   _endpoint
     , void *            _buffer
-    , int               _bufferSize
+    , int               _BUFFER_SIZE
 )
 {
-    //TODO
-    return 0;
+    return readTktUsbEndpoint(
+        ( TktUsbEndpoint * )_endpoint
+        , _buffer
+        , _BUFFER_SIZE
+    );
 }
 
 int tktUsbWrite(

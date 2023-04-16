@@ -182,7 +182,7 @@ int readTktUsbEndpoint(
 
 int writeTktUsbEndpoint(
     TktUsbEndpoint *    _endpoint
-    , void *            _data
+    , const void *      _DATA
     , int               _DATA_SIZE
 )
 {
@@ -192,7 +192,7 @@ int writeTktUsbEndpoint(
         sceUsbbdReqSend
         , &request
         , _endpoint
-        , _data
+        , ( void * )_DATA
         , _DATA_SIZE
     );
 

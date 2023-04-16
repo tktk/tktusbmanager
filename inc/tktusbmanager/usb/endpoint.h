@@ -57,7 +57,7 @@ int readTktUsbEndpoint(
 
 int writeTktUsbEndpoint(
     TktUsbEndpoint *
-    , void *
+    , const void *
     , int
 );
 
