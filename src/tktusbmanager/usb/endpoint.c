@@ -99,3 +99,74 @@ int isWritableTktUsbEndpoint(
 {
     return ( _ENDPOINT->endpoint & USB_ENDPOINT_IN ) == USB_ENDPOINT_IN;
 }
+
+enum {
+    USB_WAITING = 0x1,
+};
+
+int readRequestDone(
+    struct UsbdDeviceReq *  _request
+    , int                   _arg2
+    , int                   _arg3
+)
+{
+    TktUsbEndpoint *    endpoint = ( TktUsbEndpoint * )( _request->arg );
+
+    sceKernelSetEventFlag(
+        endpoint->eventFlagId
+        , USB_WAITING
+    );
+
+    return 0;
+}
+
+int readTktUsbEndpoint(
+    TktUsbEndpoint *    _endpoint
+    , void *            _buffer
+    , int               _BUFFER_SIZE
+)
+{
+    struct UsbdDeviceReq    request;
+
+    u32 result;
+
+    memset(
+        &request
+        , 0
+        , sizeof( request )
+    );
+
+    request.endp = _endpoint->usbEndpoint;
+    request.data = _buffer;
+    request.size = _BUFFER_SIZE;
+    request.func = readRequestDone;
+    request.arg = _endpoint;
+
+    sceUsbbdReqRecv( &request );
+
+    sceKernelWaitEventFlag(
+        _endpoint->eventFlagId
+        , USB_WAITING
+        , PSP_EVENT_WAITOR | PSP_EVENT_WAITCLEAR
+        , &result
+        , NULL
+    );
+
+    int returnCode = request.retcode;
+
+    if( returnCode != 0 ) {
+        return returnCode;
+    }
+
+    return request.recvsize;
+}
+
+int writeTktUsbEndpoint(
+    TktUsbEndpoint *    _endpoint
+    , void *            _data
+    , int               _DATA_SIZE
+)
+{
+    //TODO
+    return -1;
+}

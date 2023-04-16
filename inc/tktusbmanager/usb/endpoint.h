@@ -49,4 +49,16 @@ int isWritableTktUsbEndpoint(
     const TktUsbEndpoint *
 );
 
+int readTktUsbEndpoint(
+    TktUsbEndpoint *
+    , void *
+    , int
+);
+
+int writeTktUsbEndpoint(
+    TktUsbEndpoint *
+    , void *
+    , int
+);
+
 #endif  // TKTUSBMANAGER_USB_ENDPOINT_H
