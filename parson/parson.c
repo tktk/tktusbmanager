@@ -1894,8 +1894,16 @@ JSON_Value * json_parse_file_with_comments(const char *filename) {
     parson_free(file_contents);
     return output_value;
 }
+*/
 
-JSON_Value * json_parse_string(const char *string) {
+JSON_Value * json_parse_string(
+    SceUID *        valueIdPtr
+    , const char *  string
+)
+{
+    //TODO
+    return NULL;
+/*
     if (string == NULL) {
         return NULL;
     }
@@ -1903,8 +1911,8 @@ JSON_Value * json_parse_string(const char *string) {
         string = string + 3; // Support for UTF-8 BOM
     }
     return parse_value((const char**)&string, 0);
-}
 */
+}
 
 JSON_Value * json_parse_string_with_comments(
     SceUID *        valueIdPtr

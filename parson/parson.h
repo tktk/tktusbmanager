@@ -104,7 +104,10 @@ JSON_Value * json_parse_file(const char *filename);
 JSON_Value * json_parse_file_with_comments(const char *filename);
 
 /*  Parses first JSON value in a string, returns NULL in case of error */
-JSON_Value * json_parse_string(const char *string);
+JSON_Value * json_parse_string(
+    SceUID *        valueIdPtr
+    , const char *  string
+);
 
 /*  Parses first JSON value in a string and ignores comments (/ * * / and //),
     returns NULL in case of error */
