@@ -310,7 +310,6 @@ static int usbAttach(
     , void *    _arg3
 )
 {
-    //TODO
     return 0;
 }
 
@@ -320,7 +319,6 @@ static int usbDetach(
     , int   _arg3
 )
 {
-    //TODO
     return 0;
 }
 
