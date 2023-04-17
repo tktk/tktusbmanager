@@ -143,7 +143,7 @@ static int parseConfigFile(
 {
     SceUID  rootJsonId = 0;
 
-    JSON_Value *    rootJson = json_parse_string_with_comments(
+    JSON_Value *    rootJson = json_parse_string(
         &rootJsonId
         , _CONTENTS
     );
