@@ -1901,17 +1901,20 @@ JSON_Value * json_parse_string(
     , const char *  string
 )
 {
-    //TODO
-    return NULL;
-/*
-    if (string == NULL) {
+    SceUID  valueId = 0;
+
+    JSON_Value *    value = parse_value(
+        &valueId
+        , &string
+        , 0
+    );
+    if( value == NULL ) {
         return NULL;
     }
-    if (string[0] == '\xEF' && string[1] == '\xBB' && string[2] == '\xBF') {
-        string = string + 3; // Support for UTF-8 BOM
-    }
-    return parse_value((const char**)&string, 0);
-*/
+
+    *valueIdPtr = valueId;
+
+    return value;
 }
 
 JSON_Value * json_parse_string_with_comments(
