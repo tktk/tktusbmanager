@@ -5,6 +5,8 @@
 #include <string.h>
 #include <stddef.h>
 
+#define EVENT_FLAG_NAME "tktusbmanager"
+
 enum {
     USB_ENDPOINT_IN = 0x80,
 
@@ -19,7 +21,7 @@ int allocTktUsbEndpoint(
 )
 {
     SceUID  eventFlagId = sceKernelCreateEventFlag(
-        "tktusbmanager"
+        EVENT_FLAG_NAME
         , PSP_EVENT_WAITMULTIPLE
         , 0
         , NULL
