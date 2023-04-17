@@ -11,11 +11,17 @@
 #define BLOCK_COMMENT_BEGIN "/*"
 #define BLOCK_COMMENT_END "*/"
 
+#define LINE_COMMENT_BEGIN "//"
+
 enum {
+    SPACE = ' ',
+    END_LINE = '\n',
+    END_STRING = '\0',
+
     BLOCK_COMMENT_BEGIN_SIZE = sizeof( BLOCK_COMMENT_BEGIN ) - 1,
     BLOCK_COMMENT_END_SIZE = sizeof( BLOCK_COMMENT_END ) - 1,
 
-    SPACE = ' ',
+    LINE_COMMENT_BEGIN_SIZE = sizeof( LINE_COMMENT_BEGIN ) - 1,
 };
 
 static void freeEndpoint(
@@ -183,6 +189,48 @@ static int fillBlockComment(
     return 0;
 }
 
+static void fillLineComment(
+    char *  _contents
+)
+{
+    char *  contentsPtr = _contents;
+
+    while( 1 ) {
+        char *  beginCommentPtr = strstr(
+            contentsPtr
+            , LINE_COMMENT_BEGIN
+        );
+        if( beginCommentPtr == NULL ) {
+            break;
+        }
+
+        char *  inCommentPtr = beginCommentPtr + LINE_COMMENT_BEGIN_SIZE;
+
+        char *  endCommentPtr = strchr(
+            inCommentPtr
+            , END_LINE
+        );
+        if( endCommentPtr == NULL ) {
+            endCommentPtr = strchr(
+                inCommentPtr
+                , END_STRING
+            );
+        }
+
+        memset(
+            beginCommentPtr
+            , SPACE
+            , ( size_t )endCommentPtr - ( size_t )beginCommentPtr
+        );
+
+        if( *endCommentPtr == END_STRING ) {
+            break;
+        }
+
+        contentsPtr = endCommentPtr + 1;
+    }
+}
+
 static int parseConfigFile(
     TktUsbManagerConfig *   _config
     , char *                _contents
@@ -194,6 +242,8 @@ static int parseConfigFile(
     if( result != 0 ) {
         return result;
     }
+
+    fillLineComment( _contents );
 
     SceUID  rootJsonId = 0;
 
