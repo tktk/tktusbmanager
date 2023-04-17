@@ -172,7 +172,6 @@ struct json_array_t {
 // Various
 /*
 static char * read_file(const char *filename);
-*/
 static void   remove_comments(char *string, const char *start_token, const char *end_token);
 static char * parson_strndup(
     SceUID *        stringIdPtr
@@ -183,6 +182,7 @@ static char * parson_strdup(
     SceUID *        stringIdPtr
     , const char *  string
 );
+*/
 static int    hex_char_to_int(char c);
 static JSON_Status parse_utf16_hex(const char *string, unsigned int *result);
 /*
@@ -342,7 +342,6 @@ static char * read_file(const char * filename) {
     file_contents[size_read] = '\0';
     return file_contents;
 }
-*/
 
 static void remove_comments(char *string, const char *start_token, const char *end_token) {
     parson_bool_t in_string = PARSON_FALSE, escaped = PARSON_FALSE;
@@ -414,6 +413,7 @@ static char * parson_strdup(
         , strlen( string )
     );
 }
+*/
 
 static int hex_char_to_int(char c) {
     if (c >= '0' && c <= '9') {
@@ -1917,6 +1917,7 @@ JSON_Value * json_parse_string(
     return value;
 }
 
+/*
 JSON_Value * json_parse_string_with_comments(
     SceUID *        valueIdPtr
     , const char *  string
@@ -1955,6 +1956,7 @@ JSON_Value * json_parse_string_with_comments(
 
     return value;
 }
+*/
 
 // JSON Object API
 
