@@ -214,7 +214,7 @@ static TktUsbEndpoint * tktUsbGetEndpoint(
         return NULL;
     }
 
-    if( _IS_ENABLE_ENDPOINT( endpoint ) != 0 ) {
+    if( _IS_ENABLE_ENDPOINT( endpoint ) == 0 ) {
         return NULL;
     }
 
