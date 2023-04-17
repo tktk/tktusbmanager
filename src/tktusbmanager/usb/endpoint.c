@@ -10,7 +10,7 @@
 enum {
     USB_ENDPOINT_IN = 0x80,
 
-    USB_WAITING = 0x1,
+    USB_REQUEST_DONE = 0x1,
 };
 
 int allocTktUsbEndpoint(
@@ -114,7 +114,7 @@ static int usbRequestDone(
 
     sceKernelSetEventFlag(
         endpoint->eventFlagId
-        , USB_WAITING
+        , USB_REQUEST_DONE
     );
 
     return 0;
@@ -124,7 +124,7 @@ typedef int ( * SceUsbbdRequest )(
     struct UsbdDeviceReq *
 );
 
-static void requestTktUsbEndpoint(
+static int requestTktUsbEndpoint(
     SceUsbbdRequest             _SCE_USBBD_REQUEST
     , struct UsbdDeviceReq *    _request
     , TktUsbEndpoint *          _endpoint
@@ -132,7 +132,7 @@ static void requestTktUsbEndpoint(
     , int                       _BUFFER_SIZE
 )
 {
-    u32 result;
+    u32 outFlag;
 
     memset(
         _request
@@ -146,15 +146,20 @@ static void requestTktUsbEndpoint(
     _request->func = usbRequestDone;
     _request->arg = _endpoint;
 
-    _SCE_USBBD_REQUEST( _request );
+    const int   RESULT = _SCE_USBBD_REQUEST( _request );
+    if( RESULT != 0 ) {
+        return RESULT;
+    }
 
     sceKernelWaitEventFlag(
         _endpoint->eventFlagId
-        , USB_WAITING
+        , USB_REQUEST_DONE
         , PSP_EVENT_WAITOR | PSP_EVENT_WAITCLEAR
-        , &result
+        , &outFlag
         , NULL
     );
+
+    return 0;
 }
 
 int readTktUsbEndpoint(
@@ -165,18 +170,21 @@ int readTktUsbEndpoint(
 {
     struct UsbdDeviceReq    request;
 
-    requestTktUsbEndpoint(
+    const int   RESULT = requestTktUsbEndpoint(
         sceUsbbdReqRecv
         , &request
         , _endpoint
         , _buffer
         , _BUFFER_SIZE
     );
+    if( RESULT != 0 ) {
+        return RESULT;
+    }
 
-    int returnCode = request.retcode;
+    const int   RETURN_CODE = request.retcode;
 
-    if( returnCode != 0 ) {
-        return returnCode;
+    if( RETURN_CODE != 0 ) {
+        return RETURN_CODE;
     }
 
     return request.recvsize;
@@ -190,13 +198,16 @@ int writeTktUsbEndpoint(
 {
     struct UsbdDeviceReq    request;
 
-    requestTktUsbEndpoint(
+    const int   RESULT = requestTktUsbEndpoint(
         sceUsbbdReqSend
         , &request
         , _endpoint
         , ( void * )_DATA
         , _DATA_SIZE
     );
+    if( RESULT != 0 ) {
+        return RESULT;
+    }
 
     return request.retcode;
 }
