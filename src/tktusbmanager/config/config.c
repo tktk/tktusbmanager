@@ -15,8 +15,13 @@
 
 enum {
     SPACE = ' ',
+    COMMA = ',',
+
     END_LINE = '\n',
     END_STRING = '\0',
+
+    END_JSON_ARRAY = ']',
+    END_JSON_OBJECT = '}',
 
     BLOCK_COMMENT_BEGIN_SIZE = sizeof( BLOCK_COMMENT_BEGIN ) - 1,
     BLOCK_COMMENT_END_SIZE = sizeof( BLOCK_COMMENT_END ) - 1,
@@ -152,43 +157,6 @@ static int parseConfigJson(
     return 0;
 }
 
-static int fillBlockComment(
-    char *  _contents
-)
-{
-    char *  contentsPtr = _contents;
-
-    while( 1 ) {
-        char *  beginCommentPtr = strstr(
-            contentsPtr
-            , BLOCK_COMMENT_BEGIN
-        );
-        if( beginCommentPtr == NULL ) {
-            break;
-        }
-
-        char *  endCommentPtr = strstr(
-            beginCommentPtr + BLOCK_COMMENT_BEGIN_SIZE
-            , BLOCK_COMMENT_END
-        );
-        if( endCommentPtr == NULL ) {
-            return 1;
-        }
-
-        endCommentPtr += BLOCK_COMMENT_END_SIZE;
-
-        memset(
-            beginCommentPtr
-            , SPACE
-            , ( size_t )endCommentPtr - ( size_t )beginCommentPtr
-        );
-
-        contentsPtr = endCommentPtr;
-    }
-
-    return 0;
-}
-
 static void fillLineComment(
     char *  _contents
 )
@@ -231,6 +199,72 @@ static void fillLineComment(
     }
 }
 
+static int fillBlockComment(
+    char *  _contents
+)
+{
+    char *  contentsPtr = _contents;
+
+    while( 1 ) {
+        char *  beginCommentPtr = strstr(
+            contentsPtr
+            , BLOCK_COMMENT_BEGIN
+        );
+        if( beginCommentPtr == NULL ) {
+            break;
+        }
+
+        char *  endCommentPtr = strstr(
+            beginCommentPtr + BLOCK_COMMENT_BEGIN_SIZE
+            , BLOCK_COMMENT_END
+        );
+        if( endCommentPtr == NULL ) {
+            return 1;
+        }
+
+        endCommentPtr += BLOCK_COMMENT_END_SIZE;
+
+        memset(
+            beginCommentPtr
+            , SPACE
+            , ( size_t )endCommentPtr - ( size_t )beginCommentPtr
+        );
+
+        contentsPtr = endCommentPtr;
+    }
+
+    return 0;
+}
+
+static void fillTailComma(
+    char *  _contents
+)
+{
+    char *  contentsPtr = _contents;
+
+    while( 1 ) {
+        char *  commaPtr = strchr(
+            contentsPtr
+            , COMMA
+        );
+        if( commaPtr == NULL ) {
+            break;
+        }
+
+        contentsPtr = commaPtr + 1;
+
+        while( isspace( *contentsPtr ) != 0 ) {
+            contentsPtr++;
+        }
+
+        if( *contentsPtr != END_JSON_ARRAY && *contentsPtr != END_JSON_OBJECT ) {
+            continue;
+        }
+
+        *commaPtr = SPACE;
+    }
+}
+
 static int parseConfigFile(
     TktUsbManagerConfig *   _config
     , char *                _contents
@@ -238,12 +272,14 @@ static int parseConfigFile(
 {
     int result;
 
+    fillLineComment( _contents );
+
     result = fillBlockComment( _contents );
     if( result != 0 ) {
         return result;
     }
 
-    fillLineComment( _contents );
+    fillTailComma( _contents );
 
     SceUID  rootJsonId = 0;
 
@@ -255,7 +291,7 @@ static int parseConfigFile(
         return 1;
     }
 
-    const int   RESULT = parseConfigJson(
+    result = parseConfigJson(
         _config
         , rootJson
     );
@@ -265,7 +301,7 @@ static int parseConfigFile(
         , rootJson
     );
 
-    return RESULT;
+    return result;
 }
 
 int loadConfigFile(
