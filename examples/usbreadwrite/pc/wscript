@@ -1,0 +1,15 @@
+# -*- coding: utf-8 -*-
+
+from taf import *
+
+APPNAME = 'usbreadwritetest'
+VERSION = '1.0.0'
+
+out = 'build'
+
+taf.PACKAGE_NAME = 'usbreadwritetest'
+
+taf.LOAD_TOOLS = [
+    'compiler_cxx',
+    'taf.tools.cpp',
+]
