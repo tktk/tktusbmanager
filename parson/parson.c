@@ -1462,6 +1462,7 @@ static JSON_Value * parse_array_value(
     SKIP_WHITESPACES( string );
     if( **string == ']' ) { // empty array
         SKIP_CHAR( string );
+        *valueIdPtr = valueId;
         return output_value;
     }
     while( **string != '\0' ) {
