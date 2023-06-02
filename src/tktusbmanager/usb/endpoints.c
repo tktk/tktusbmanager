@@ -17,13 +17,6 @@ int allocTktUsbEndpoints(
 
     TktUsbEndpoint *    endpoints = ( TktUsbEndpoint * )getMemoryAddress( endpointsId );
 
-    size_t  i;
-    for( i = 0 ; i < _ENDPOINTS_COUNT ; i++ ) {
-        TktUsbEndpoint *    endpoint = endpoints + i;
-
-        endpoint->nameId = 0;
-    }
-
     _endpoints->endpointsId = endpointsId;
     _endpoints->endpointsCount = _ENDPOINTS_COUNT;
     _endpoints->endpoints = endpoints;

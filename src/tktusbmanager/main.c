@@ -48,15 +48,13 @@ static int initializeUsbEndpoints(
     for( i = 0 ; i < ENDPOINTS_COUNT ; i++ ) {
         const TktUsbManagerConfigEndpoint * ENDPOINT_CONFIG = _CONFIG->endpoints + i;
 
-        result = allocTktUsbEndpoint(
+        result = initializeTktUsbEndpoint(
             usbEndpoints_.endpoints + i
             , ENDPOINT_CONFIG->nameSize
             , ENDPOINT_CONFIG->name
             , ENDPOINT_CONFIG->endpoint
         );
         if( result != 0 ) {
-            freeTktUsbEndpoints( &usbEndpoints_ );
-
             return result;
         }
     }

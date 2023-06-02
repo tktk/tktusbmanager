@@ -13,7 +13,7 @@ enum {
     USB_REQUEST_DONE = 0x1,
 };
 
-int allocTktUsbEndpoint(
+int initializeTktUsbEndpoint(
     TktUsbEndpoint *    _endpoint
     , size_t            _NAME_SIZE
     , const char *      _NAME
@@ -30,24 +30,17 @@ int allocTktUsbEndpoint(
         return 1;
     }
 
-    SceUID  nameId = allocMemory( _NAME_SIZE * sizeof( *( _endpoint->name ) ) );
-    if( nameId < 0 ) {
-        sceKernelDeleteEventFlag( eventFlagId );
+    const size_t    NAME_SIZE = _NAME_SIZE <= MAX_ENDPOINT_NAME_SIZE
+        ? _NAME_SIZE
+        : MAX_ENDPOINT_NAME_SIZE
+    ;
 
-        return 1;
-    }
-
-    char *  name = ( char * )getMemoryAddress( nameId );
-
+    _endpoint->nameSize = NAME_SIZE;
     memcpy(
-        name
+        _endpoint->name
         , _NAME
-        , _NAME_SIZE
+        , NAME_SIZE
     );
-
-    _endpoint->nameId = nameId;
-    _endpoint->nameSize = _NAME_SIZE;
-    _endpoint->name = name;
     _endpoint->endpoint = _ENDPOINT;
     _endpoint->eventFlagId = eventFlagId;
 
@@ -58,9 +51,6 @@ void freeTktUsbEndpoint(
     TktUsbEndpoint *    _endpoint
 )
 {
-    freeMemory( _endpoint->nameId );
-    _endpoint->nameId = 0;
-
     sceKernelDeleteEventFlag( _endpoint->eventFlagId );
     _endpoint->eventFlagId = 0;
 }

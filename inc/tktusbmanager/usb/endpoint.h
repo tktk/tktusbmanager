@@ -6,11 +6,14 @@
 #include <pspkerneltypes.h>
 #include <stddef.h>
 
+enum {
+    MAX_ENDPOINT_NAME_SIZE = 20,
+};
+
 typedef struct TktUsbEndpoint
 {
-    SceUID  nameId;
     size_t  nameSize;
-    char *  name;
+    char    name[ MAX_ENDPOINT_NAME_SIZE ];
 
     char    endpoint;
 
@@ -19,7 +22,7 @@ typedef struct TktUsbEndpoint
     struct UsbEndpoint *    usbEndpoint;
 } TktUsbEndpoint;
 
-int allocTktUsbEndpoint(
+int initializeTktUsbEndpoint(
     TktUsbEndpoint *
     , size_t
     , const char *
