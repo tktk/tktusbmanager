@@ -567,6 +567,7 @@ static JSON_Object * json_object_make(
         parson_free( objectId );
         return NULL;
     }
+    *objectIdPtr = objectId;
 
     new_object->wrapping_value = wrapping_value;
     return new_object;
@@ -1344,6 +1345,7 @@ static JSON_Value * parse_object_value(
     SKIP_WHITESPACES( string );
     if( **string == '}' ) { // empty object
         SKIP_CHAR( string );
+        *valueIdPtr = valueId;
         return output_value;
     }
     while( **string != '\0' ) {
@@ -1434,6 +1436,7 @@ static JSON_Value * parse_object_value(
         return NULL;
     }
     SKIP_CHAR( string );
+    *valueIdPtr = valueId;
     return output_value;
 }
 
