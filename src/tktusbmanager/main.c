@@ -32,17 +32,11 @@ static int initializeUsbEndpoints(
 {
     int result;
 
-    TktUsbEndpoints usbEndpoints_;
-
     const size_t    ENDPOINTS_COUNT = _CONFIG->endpointsCount;
 
-    result = allocTktUsbEndpoints(
-        &usbEndpoints_
-        , ENDPOINTS_COUNT
-    );
-    if( result != 0 ) {
-        return result;
-    }
+    TktUsbEndpoints usbEndpoints_ = {
+        .endpointsCount = ENDPOINTS_COUNT,
+    };
 
     size_t i;
     for( i = 0 ; i < ENDPOINTS_COUNT ; i++ ) {
@@ -144,7 +138,6 @@ static int startUsb(
     result = registerAndStartUsb( &usbDriver );
     if( result != 0 ) {
         freeTktUsbDriver( &usbDriver );
-        freeTktUsbEndpoints( &usbEndpoints );
 
         return result;
     }
@@ -187,8 +180,6 @@ int module_stop(
 )
 {
     stopUsb();
-
-    freeTktUsbEndpoints( &usbEndpoints );
 
     return 0;
 }
