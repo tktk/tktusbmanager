@@ -409,13 +409,6 @@ int initializeTktUsbDriver(
     return 0;
 }
 
-//REMOVEME
-void freeTktUsbDriver(
-    TktUsbDriver *  _driver
-)
-{
-}
-
 int registerTktUsbDriver(
     TktUsbDriver *  _driver
 )

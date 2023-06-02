@@ -137,8 +137,6 @@ static int startUsb(
 
     result = registerAndStartUsb( &usbDriver );
     if( result != 0 ) {
-        freeTktUsbDriver( &usbDriver );
-
         return result;
     }
 
@@ -152,8 +150,6 @@ static void stopUsb(
     stopTktUsbDriver( &usbDriver );
     stopUsbBus();
     unregisterTktUsbDriver( &usbDriver );
-
-    freeTktUsbDriver( &usbDriver );
 }
 
 int module_start(

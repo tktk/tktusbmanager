@@ -39,10 +39,6 @@ int initializeTktUsbDriver(
     , const TktUsbEndpoints *
 );
 
-void freeTktUsbDriver(
-    TktUsbDriver *
-);
-
 int registerTktUsbDriver(
     TktUsbDriver *
 );
