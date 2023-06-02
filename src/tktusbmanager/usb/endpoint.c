@@ -65,7 +65,7 @@ void freeTktUsbEndpoint(
     _endpoint->eventFlagId = 0;
 }
 
-void initializeTktUsbEndpoint(
+void setUpTktUsbEndpoint(
     TktUsbEndpoint *        _endpoint
     , struct UsbEndpoint *  _usbEndpoint
 )

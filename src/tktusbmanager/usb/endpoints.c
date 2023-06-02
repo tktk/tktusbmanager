@@ -63,7 +63,7 @@ void initializeTktUsbEndpoints(
         TktUsbEndpoint *        endpoint = _endpoints->endpoints + i;
         struct UsbEndpoint *    userUsbEndpoint = userUsbEndpoints + i;
 
-        initializeTktUsbEndpoint(
+        setUpTktUsbEndpoint(
             endpoint
             , userUsbEndpoint
         );

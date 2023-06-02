@@ -30,7 +30,7 @@ void freeTktUsbEndpoint(
     TktUsbEndpoint *
 );
 
-void initializeTktUsbEndpoint(
+void setUpTktUsbEndpoint(
     TktUsbEndpoint *
     , struct UsbEndpoint *
 );
