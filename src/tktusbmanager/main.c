@@ -121,7 +121,7 @@ static int startUsb(
 {
     int result;
 
-    result = allocTktUsbDriver(
+    result = initializeTktUsbDriver(
         &usbDriver
         , TKTUSBMANAGER_DRIVERNAME
         , &usbEndpoints

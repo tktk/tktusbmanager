@@ -3,4 +3,8 @@
 
 typedef struct TktUsbEndpoints TktUsbEndpoints;
 
+enum {
+    MAX_USER_ENDPOINTS_COUNT = 8,
+};
+
 #endif  // TKTUSBMANAGER_DEF_USB_ENDPOINTS_H

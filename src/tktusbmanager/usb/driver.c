@@ -9,24 +9,9 @@
 #include <stddef.h>
 
 enum {
-    STRING_DESCRIPTOR_SIZE = 8 * sizeof( char ),
-
     MAX_PACKET_SIZE_HI = 512,
     MAX_PACKET_SIZE_FULL = 64,
 };
-
-typedef struct
-{
-    unsigned char   devdesc[ 20 ];
-
-    struct Config   config;
-    struct ConfDesc confdesc;
-
-    unsigned char   pad1[ 8 ];
-
-    struct Interfaces   interfaces;
-    struct InterDesc    interdesc;
-} __attribute__( ( packed ) ) UsbData_;
 
 static void initializeUsbEndpoints(
     struct UsbEndpoint *        _usbEndpoints
@@ -374,93 +359,61 @@ static void initializeUsbDriver(
     _usbDriver->link = NULL;
 }
 
-int allocTktUsbDriver(
+int initializeTktUsbDriver(
     TktUsbDriver *              _driver
     , const char *              _DRIVER_NAME
     , const TktUsbEndpoints *   _ENDPOINTS
 )
 {
-    struct UsbDriver *  usbDriver = &( _driver->usbDriver );
-
     const size_t    USER_ENDPOINTS_COUNT = _ENDPOINTS->endpointsCount;
 
     const size_t    ALL_ENDPOINTS_COUNT = USER_ENDPOINTS_COUNT + 1;
 
-    const SceSize   MEMORY_SIZE = ALL_ENDPOINTS_COUNT * sizeof( struct UsbEndpoint )
-        + sizeof( struct UsbInterface )
-        + sizeof( UsbData_ )
-        + ALL_ENDPOINTS_COUNT * sizeof( struct Endp )
-        + sizeof( UsbData_ )
-        + ALL_ENDPOINTS_COUNT * sizeof( struct Endp )
-        + STRING_DESCRIPTOR_SIZE
-    ;
-
-    SceUID  memoryId = allocMemory( MEMORY_SIZE );
-
-    void *  memoryPtr = getMemoryAddress( memoryId );
-    memset(
-        memoryPtr
-        , 0
-        , MEMORY_SIZE
-    );
-
-    struct UsbEndpoint *    usbEndpoints = ( struct UsbEndpoint * )memoryPtr;
-    struct UsbInterface *   usbInterface = ( struct UsbInterface * )( usbEndpoints + ALL_ENDPOINTS_COUNT );
-    UsbData_ *              usbDataHi = ( UsbData_ * )( usbInterface + 1 );
-    struct Endp *           usbEndpointDescriptorsHi = ( struct Endp * )( usbDataHi + 1 );
-    UsbData_ *              usbDataFull = ( UsbData_ * )( usbEndpointDescriptorsHi + ALL_ENDPOINTS_COUNT );
-    struct Endp *           usbEndpointDescriptorsFull = ( struct Endp * )( usbDataFull + 1 );
-    unsigned char *         stringDescriptor = ( unsigned char * )( usbEndpointDescriptorsFull + ALL_ENDPOINTS_COUNT );
-
     initializeUsbEndpoints(
-        usbEndpoints
+        _driver->usbEndpoints
         , _ENDPOINTS
         , ALL_ENDPOINTS_COUNT
     );
-    initializeUsbInterface( usbInterface );
+    initializeUsbInterface( &( _driver->usbInterface ) );
     initializeUsbData(
-        usbDataHi
-        , usbEndpointDescriptorsHi
+        &( _driver->usbDataHi )
+        , _driver->usbEndpointDescriptorsHi
         , USER_ENDPOINTS_COUNT
     );
     initializeUsbEndpointDescriptorsHi(
-        usbEndpointDescriptorsHi
+        _driver->usbEndpointDescriptorsHi
         , _ENDPOINTS
     );
     initializeUsbData(
-        usbDataFull
-        , usbEndpointDescriptorsFull
+        &( _driver->usbDataFull )
+        , _driver->usbEndpointDescriptorsFull
         , USER_ENDPOINTS_COUNT
     );
     initializeUsbEndpointDescriptorsFull(
-        usbEndpointDescriptorsFull
+        _driver->usbEndpointDescriptorsFull
         , _ENDPOINTS
     );
-    initializeStringDescriptor( stringDescriptor );
+    initializeStringDescriptor( _driver->stringDescriptor );
 
     initializeUsbDriver(
-        usbDriver
-        , usbEndpoints
-        , usbInterface
-        , usbDataHi
-        , usbDataFull
-        , stringDescriptor
+        &( _driver->usbDriver )
+        , _driver->usbEndpoints
+        , &( _driver->usbInterface )
+        , &( _driver->usbDataHi )
+        , &( _driver->usbDataFull )
+        , _driver->stringDescriptor
         , _DRIVER_NAME
         , ALL_ENDPOINTS_COUNT
     );
 
-    _driver->memoryId = memoryId;
-
     return 0;
 }
 
+//REMOVEME
 void freeTktUsbDriver(
     TktUsbDriver *  _driver
 )
 {
-    freeMemory( _driver->memoryId );
-
-    _driver->memoryId = 0;
 }
 
 int registerTktUsbDriver(

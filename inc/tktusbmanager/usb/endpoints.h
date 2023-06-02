@@ -6,10 +6,6 @@
 #include "tktusbmanager/def/usb/driver.h"
 #include <stddef.h>
 
-enum {
-    MAX_USER_ENDPOINTS_COUNT = 8,
-};
-
 typedef struct TktUsbEndpoints
 {
     size_t          endpointsCount;

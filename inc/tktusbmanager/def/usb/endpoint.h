@@ -3,4 +3,8 @@
 
 typedef struct TktUsbEndpoint TktUsbEndpoint;
 
+enum {
+    MAX_ENDPOINT_NAME_SIZE = 20,
+};
+
 #endif  // TKTUSBMANAGER_DEF_USB_ENDPOINT_H

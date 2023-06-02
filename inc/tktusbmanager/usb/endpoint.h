@@ -6,10 +6,6 @@
 #include <pspkerneltypes.h>
 #include <stddef.h>
 
-enum {
-    MAX_ENDPOINT_NAME_SIZE = 20,
-};
-
 typedef struct TktUsbEndpoint
 {
     size_t  nameSize;
